@@ -3,6 +3,9 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import logo from '../assets/stone-cube-logo.svg';
+import { Image } from 'astro:assets';
+
 ---
 
 <!doctype html>
@@ -13,36 +16,24 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+		<h1 style="display: flex; justify-content: center;"><Image src={logo} alt={SITE_TITLE} height={65} />Bonjour à tous ! <Image src={logo} alt={SITE_TITLE} height={65} /></h1>
+		<p>
+			Développeurs, curieux du web et passionnés de tech, bienvenue !
+		</p>
+		<p>
+
+			Les agents de coding font aujourd'hui beaucoup parler d'eux — et pour cause :
+			ils transforment en profondeur notre façon de coder.
+		</p>
+		<p>
+			Dans ce blog, je partage mes astuces concrètes pour tirer le meilleur parti de
+			de ces outils au quotidien.
+		</p>
+		<p>
+
+			Une question ? Une idée de sujet ? N'hésitez pas à laisser un commentaire
+			en bas des articles, je lis tout et je vous réponds dès que possible !
+		</p>
 		</main>
 		<Footer />
 	</body>

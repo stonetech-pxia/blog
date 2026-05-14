@@ -1,0 +1,38 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Stone cube logo</title>
+  <desc id="desc">A minimal isometric stone cube logo designed for clean SVG use.</desc>
+  <defs>
+    <linearGradient id="top" x1="156" y1="104" x2="356" y2="216" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E2E0D8"/>
+      <stop offset="1" stop-color="#A9A89F"/>
+    </linearGradient>
+    <linearGradient id="left" x1="112" y1="192" x2="256" y2="384" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BCBBB2"/>
+      <stop offset="1" stop-color="#76766F"/>
+    </linearGradient>
+    <linearGradient id="right" x1="400" y1="192" x2="256" y2="384" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#999990"/>
+      <stop offset="1" stop-color="#52534E"/>
+    </linearGradient>
+    <filter id="softShadow" x="76" y="72" width="360" height="384" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#1D1F1E" flood-opacity=".18"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <path d="M256 96 392 172 256 248 120 172 256 96Z" fill="url(#top)"/>
+    <path d="M120 172 256 248v168L120 340V172Z" fill="url(#left)"/>
+    <path d="M392 172 256 248v168l136-76V172Z" fill="url(#right)"/>
+
+    <path d="M256 96 392 172 256 248 120 172 256 96Z" stroke="#4F504B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M120 172v168l136 76 136-76V172" stroke="#4F504B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M256 248v168" stroke="#4F504B" stroke-width="12" stroke-linecap="round"/>
+
+    <path d="M178 162c22-11 53-11 80 2" stroke="#6E6E67" stroke-width="9" stroke-linecap="round" opacity=".38"/>
+    <path d="M292 144c19 4 35 10 50 18" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity=".45"/>
+    <path d="M154 236c23 14 44 20 68 21" stroke="#F1EFE8" stroke-width="8" stroke-linecap="round" opacity=".32"/>
+    <path d="M318 286c22-10 38-22 56-44" stroke="#2F302D" stroke-width="8" stroke-linecap="round" opacity=".22"/>
+    <path d="M194 312c18 8 33 19 44 34" stroke="#3D3E3A" stroke-width="7" stroke-linecap="round" opacity=".26"/>
+    <path d="M304 352c18-8 34-16 52-30" stroke="#E0DDD3" stroke-width="7" stroke-linecap="round" opacity=".24"/>
+  </g>
+</svg>
