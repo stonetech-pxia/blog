@@ -2,14 +2,13 @@
 
 ## Overview
 
-The site uses a single custom, accessibility-oriented typeface and a consistent stone-cube brand mark.
+The site uses a custom typeface loaded from Google Fonts and a consistent stone-cube brand mark.
 
 ## Typography
 
-- The site font is Atkinson Hyperlegible, a typeface designed for high legibility.
-- Two variants are used: regular (weight 400) and bold (weight 700), both in normal style.
-- The font is served locally (self-hosted), not from a third-party font CDN.
-- The font is preloaded and uses swap display, so text renders immediately in a fallback and swaps to the custom font once loaded. The declared fallback is a generic sans-serif.
+- The site font is Inter, loaded from Google Fonts via Astro's fonts API.
+- Two weights are used: regular (400) and bold (700), both in normal style.
+- The font is preloaded and uses swap display, so text renders immediately in a fallback and swaps to Inter once loaded. The declared fallback is a generic sans-serif.
 
 ## Branding
 
@@ -20,5 +19,5 @@ The site uses a single custom, accessibility-oriented typeface and a consistent 
 
 ## Constraints & notes
 
-- Because the font is self-hosted and preloaded, page rendering does not depend on an external font service.
+- Because the font is loaded from Google Fonts, page rendering depends on an external font service; the swap display and preload mitigate but do not remove this dependency.
 - Brand strings (site title, site description) are centralized configuration values — see [Configuration](../configuration.md).
