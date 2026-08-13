@@ -13,10 +13,11 @@ Important design or product choices and their rationale. Confirmed rationale is 
 - **Rationale (confirmed, from the project's own design note):** Adds comments and reactions to a static blog without running a comments backend; GitHub Discussions provides storage, moderation, and authentication. Pathname mapping gives each article its own thread.
 - **Consequence:** The About page, which reuses the article layout, also renders a comment thread. See [Article comments](features/article-comments.md).
 
-## Self-hosted accessible font
+## Inter via Google Fonts
 
-- **Choice:** Serve Atkinson Hyperlegible locally (preloaded, swap display) rather than from a font CDN.
-- **Rationale (inferred):** Accessibility (the typeface is designed for legibility) and independence from third-party font services, avoiding an external request on every page load. See [Typography & branding](features/typography-and-branding.md).
+- **Choice:** Load Inter from Google Fonts (weights 400 and 700, preloaded, swap display) instead of self-hosting Atkinson Hyperlegible.
+- **Rationale (confirmed, arbitrated by the site owner):** A deliberate trade of the previous self-hosted, accessibility-focused typeface for a different visual identity, knowingly accepting a runtime dependency on a third-party font service (Google Fonts). See [Typography & branding](features/typography-and-branding.md).
+- **Superseded decision:** Previously the site served Atkinson Hyperlegible locally specifically for accessibility and to avoid any third-party font request; that rationale no longer applies.
 
 ## French content, single-author personal focus
 

@@ -25,7 +25,7 @@ The dynamic route `src/pages/blog/[...slug].astro` calls `getStaticPaths()` to g
 ### Page layout
 
 Every page is assembled from the same set of building blocks:
-- `BaseHead.astro` — injects global CSS, canonical URL, Open Graph/Twitter meta, RSS link, and the Atkinson font (loaded from `src/assets/fonts/`)
+- `BaseHead.astro` — injects global CSS, canonical URL, Open Graph/Twitter meta, RSS link, and the Inter font (loaded from Google Fonts)
 - `Header.astro` / `Footer.astro` — site-wide chrome
 - `BlogPost.astro` — the single-post layout that wraps `<slot />` with the hero image, title, and dates
 
@@ -33,7 +33,7 @@ Every page is assembled from the same set of building blocks:
 
 ### Configuration
 
-`astro.config.mjs` controls integrations (MDX, sitemap) and the local Atkinson font variants. The `site` field (`https://example.com`) must be updated to the real deployment URL for canonical URLs, the sitemap, and the RSS feed to work correctly.
+`astro.config.mjs` controls integrations (MDX, sitemap) and the Inter font loaded via the Google Fonts provider. The `site` field (`https://example.com`) must be updated to the real deployment URL for canonical URLs, the sitemap, and the RSS feed to work correctly.
 
 ### Generated endpoints
 

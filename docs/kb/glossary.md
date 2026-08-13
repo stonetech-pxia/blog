@@ -16,5 +16,5 @@ Domain terms and concepts used by StoneTech Blog.
 - **Sitemap** — A machine-readable list of the site's pages for search engines, served at `/sitemap-index.xml`. See [Sitemap](features/sitemap.md).
 - **Giscus** — A third-party commenting widget that stores comments and reactions as GitHub Discussions threads, embedded on article pages. See [Article comments](features/article-comments.md).
 - **Discussion thread** — The GitHub Discussion, mapped one-per-page by pathname, that holds an article's comments.
-- **Atkinson Hyperlegible** — The self-hosted, accessibility-focused typeface used site-wide. See [Typography & branding](features/typography-and-branding.md).
+- **Inter** — The typeface used site-wide, loaded from Google Fonts. See [Typography & branding](features/typography-and-branding.md).
 - **English-locale short date** — The display format for dates on the site (e.g. "May 15, 2026"), regardless of the French content language. See [Open Questions](open-questions.md).

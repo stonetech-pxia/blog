@@ -49,7 +49,7 @@ Prerequisites for the widget to work: GitHub Discussions enabled on the reposito
 
 ## Fonts
 
-- Typeface: Atkinson Hyperlegible, self-hosted (weights 400 and 700), preloaded, swap display, sans-serif fallback. See [Typography & branding](features/typography-and-branding.md).
+- Typeface: Inter, loaded from Google Fonts (weights 400 and 700), preloaded, swap display, sans-serif fallback. See [Typography & branding](features/typography-and-branding.md).
 
 ## Build & runtime environment
 
