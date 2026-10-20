@@ -65,6 +65,8 @@ Cette relecture n'appelle aucun modèle : elle est gratuite.
 python -m goldenline compare avant.json apres.json
 ```
 
+C'est ce qui me sert de filet de sécurité. Un ensemble de cas couvre le parcours de tous les jours, une commande simple du début à la fin, et il est jugé uniquement par du code. Avant chaque modification du prompt, je le lance pour avoir une base ; après, je relance les mêmes cas. `compare` dit, cas par cas, si une baisse dépasse le simple hasard. Si la base recule, la modification ne passe pas.
+
 ### Quatre verdicts, pas deux
 
 ![Quatre verdicts : périmé, échoué, réussi grâce au code, réussi](../../assets/golden-set-agent-vocal/verdicts.svg)
@@ -76,7 +78,7 @@ Un résultat obtenu seulement parce qu'un garde-fou a bloqué une mauvaise répo
 | Difficulté                        | Réponse de goldenline                            |
 | --------------------------------- | ------------------------------------------------ |
 | Le modèle varie                   | Chaque cas tourne plusieurs fois                 |
-| Une correction en casse une autre | Cas relancés avant et après chaque changement    |
+| Une correction en casse une autre | Base relancée après chaque changement, comparée cas par cas |
 | Appels simulés lents et bruités   | Historique figé et propre, une seule phrase      |
 | Le code rattrape le modèle        | Verdict « réussi grâce au code », compté à part  |
 | Les tests vieillissent            | Contrôle « périmé »                              |
