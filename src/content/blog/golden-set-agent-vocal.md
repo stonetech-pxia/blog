@@ -185,6 +185,6 @@ Enfin, ça ne teste que le « cerveau » de l'agent : ni la transcription de la 
 
 Ce que j'en retiens : avec un LLM, on ne teste pas une réponse, on mesure un taux. Et pour mesurer un taux sur une seule décision, il faut pouvoir remettre l'agent exactement dans la même situation — mais avec le code d'aujourd'hui, pas celui du jour de l'enregistrement.
 
-Je n'ai pas trouvé d'outil open source qui fasse exactement ça : la plupart rejouent des historiques figés sans vérifier qu'ils correspondent encore au code. J'extrais donc le mécanisme de mon projet — la relecture, le contrôle « périmé », les verdicts et les statistiques — pour le publier en open source.
+Je n'ai pas trouvé d'outil open source qui fasse exactement ça : la plupart rejouent des historiques figés sans vérifier qu'ils correspondent encore au code. J'ai donc extrait le mécanisme de mon projet et je l'ai publié en open source : [goldenline](https://github.com/stonetech-pxia/goldenline).
 
-<!-- TODO(lien open source) : ajouter ici le nom et le lien du dépôt quand ils seront fixés. -->
+C'est un petit paquet Python, sans dépendance : la relecture et le contrôle « périmé », les vérifications par du code, les verdicts qui séparent « réussi » de « réussi grâce au code », et la comparaison avant / après entre deux séries. Il s'intègre à pytest : un cas périmé y apparaît comme ignoré, et les tests qui appellent le vrai modèle ne tournent que si on le demande. Le dépôt contient un petit agent de commande de pizzas pour l'essayer.
