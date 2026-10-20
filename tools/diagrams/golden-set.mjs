@@ -111,7 +111,7 @@ function frozenVsLive() {
   s.text("Code d'aujourd'hui", tx + 142, ty + 42, { size: 26, anchor: "middle" });
   const items = [
     ["les règles du prompt,", "version du jour"],
-    ["les notes que le code", "ajoute (langue, relecture…)"],
+    ["les notes que le code", "ajoute (langue, récapitulatif…)"],
     ["les outils, ré-exécutés", "sur un menu de test"],
   ];
   items.forEach((pair, i) => {
@@ -165,7 +165,7 @@ function replayLoop() {
   // Stale check.
   const d1 = { cy: 545, h: 170, w: 480 };
   s.diamond(cx, d1.cy, d1.w, d1.h, { fill: COLORS.ask });
-  s.lines(["Autant de réponses", "demandées, avec le même", "mode réflexion ?"], cx, d1.cy, { size: 21 });
+  s.lines(["Autant de réponses", "demandées, avec le même", "mode de réflexion ?"], cx, d1.cy, { size: 21 });
   s.arrow([[cx, c.bottom + 4], [cx, d1.cy - d1.h / 2 - 6]]);
 
   s.box(712, 490, 262, 110, { fill: COLORS.stale });
@@ -240,7 +240,7 @@ function verdicts() {
   verdict(350, COLORS.fail, "ÉCHOUÉ", ["erreur du modèle"]);
   toLeft(350, "non");
 
-  ask(530, ["Le code a-t-il dû bloquer", "une mauvaise réponse", "en chemin ?"]);
+  ask(530, ["Le code a-t-il bloqué", "une réponse qui aurait", "échoué ?"]);
   down(350, 530 - dh / 2, "oui");
   s.box(vx, 530 - 58, vw, 116, { fill: COLORS.ask });
   s.lines(["RÉUSSI GRÂCE AU CODE"], vx + vw / 2, 530 - 22, { size: 23 });
@@ -289,7 +289,7 @@ function header() {
 
 const files = {
   "fige-vs-direct.svg": frozenVsLive(),
-  "relecture.svg": replayLoop(),
+  "rejeu.svg": replayLoop(),
   "verdicts.svg": verdicts(),
 };
 for (const [name, svg] of Object.entries(files)) {
