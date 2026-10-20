@@ -7,7 +7,7 @@ heroImage: "../../assets/golden-set-agent-vocal/header.png"
 
 ## Le contexte
 
-Depuis quelques mois, je construis un agent vocal qui répond au téléphone d'un restaurant et prend les commandes à emporter ou en livraison.
+Depuis quelque temps, je construis un agent vocal qui répond au téléphone d'un restaurant et prend les commandes à emporter ou en livraison.
 
 Le principe est simple sur le papier :
 
