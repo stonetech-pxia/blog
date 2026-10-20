@@ -23,7 +23,7 @@ function bubble(s, text, { x, y, right = false, fill, dashed, size = 22, colRigh
 // (a) What a case freezes, and what runs on today's code.
 function frozenVsLive() {
   const s = sketch(1000, 780, 11);
-  s.text("Un cas du golden set", 500, 52, { size: 34, anchor: "middle" });
+  s.text("Un cas de test", 500, 52, { size: 34, anchor: "middle" });
 
   // Legend.
   const legend = [
@@ -139,7 +139,7 @@ function frozenVsLive() {
     ],
     { stroke: "#2f9e44", strokeWidth: 2.2 },
   );
-  return s.svg("Un cas du golden set : ce qui est figé et ce qui tourne sur le code d'aujourd'hui");
+  return s.svg("Un cas de test : ce qui est figé et ce qui tourne sur le code d'aujourd'hui");
 }
 
 // (b) The replay and its stale check.

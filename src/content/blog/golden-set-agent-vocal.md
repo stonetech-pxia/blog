@@ -1,190 +1,92 @@
 ---
 title: "Tester un agent vocal : figer la conversation, rejouer une seule phrase"
-description: "Pourquoi un agent vocal est si difficile à tester, et le « golden set » que j'ai construit pour modifier son prompt sans tout casser."
+description: "Pourquoi un agent vocal est si difficile à tester, et comment goldenline m'aide à modifier son prompt sans tout casser."
 pubDate: "Oct 20 2026"
 heroImage: "../../assets/golden-set-agent-vocal/header.png"
 ---
 
 ## Le contexte
 
-Depuis quelque temps, je construis un agent vocal qui répond au téléphone d'un restaurant et prend les commandes à emporter ou en livraison.
+Depuis quelque temps, je construis un agent vocal qui prend des commandes au téléphone : le client parle, un modèle de langage (LLM) décide quoi répondre, une voix de synthèse lui répond.
 
-Le principe est simple sur le papier :
-
-- la voix du client est transcrite en texte ;
-- un modèle de langage (LLM) lit ce texte et décide quoi répondre ;
-- sa réponse est lue au client par une voix de synthèse.
-
-Le modèle ne fait pas tout seul : il passe par des **outils**, des fonctions que le serveur exécute pour lui — chercher un plat dans la carte, enregistrer la commande, la valider, transférer l'appel à quelqu'un du restaurant. Les prix, le total, les horaires : c'est le serveur qui les calcule, jamais le modèle.
-
-Ce qui décide du comportement de l'agent, c'est surtout son **prompt** : un long texte de règles qu'il reçoit au début de chaque appel. « Cherche toujours un plat dans la carte avant de le confirmer », « si le client parle d'une allergie, passe l'appel à une personne », etc.
-
-> Un **prompt**, c'est le mode d'emploi qu'on donne au modèle. Il ne l'apprend pas : il le relit à chaque réponse.
-
-Écrire ce prompt, c'est la partie facile. Le modifier sans rien casser, c'est là que les vrais problèmes commencent.
+Ce qui décide du comportement de l'agent, c'est surtout son **prompt** : un texte de règles que le modèle relit à chaque réponse. L'écrire est facile. Le modifier sans rien casser, beaucoup moins.
 
 ## Les difficultés
 
 ### Le modèle ne répond jamais deux fois pareil
 
-Pose deux fois la même question à un LLM, tu n'auras pas forcément la même réponse. Pour un chatbot, ce n'est pas grave. Pour un agent qui enregistre une commande, ça l'est.
-
-Conséquence directe : un test qui passe une fois ne prouve rien. Une règle peut être respectée 8 fois sur 10, et ce sont justement les 2 autres fois qui finissent en mauvaise commande.
+La même phrase ne donne pas toujours la même réponse. Un test qui passe une fois ne prouve donc rien : une règle peut être respectée 8 fois sur 10, et ce sont les 2 autres fois qui posent problème.
 
 ### Corriger une règle en casse une autre
 
-Mon prompt a grandi par accumulation : un problème observé, une règle ajoutée. Sauf que l'ancienne règle, qui disait à peu près la même chose, restait en place.
+Le prompt grandit par accumulation : un problème, une règle de plus. Mais l'ancienne règle qui disait presque la même chose reste en place, et le modèle doit choisir entre les deux. Souvent, c'est la plus ancienne qui gagne. Ça ne se voit pas en relisant le prompt, seulement en mesurant.
 
-Deux exemples réels :
+### Les appels simulés sont lents, et le faux client se trompe aussi
 
-- J'ai ajouté une règle : « si le client a tout dit d'un coup, relis-lui directement la commande ». Mais plus haut dans le prompt, une règle plus ancienne demandait de confirmer les plats un par un. C'est la première qui gagnait : seuls 7 clients sur 19 avaient droit à la relecture directe.
-- Dans l'en-tête de la liste des plats donnée au modèle, une vieille phrase disait qu'il pouvait s'en servir pour savoir si un plat était à la carte. Résultat : il répondait de mémoire au lieu de chercher dans la carte, malgré les règles qui le lui demandaient. Dans un des cas, il sautait la recherche 3 fois sur 10.
+Simuler des appels complets, avec un deuxième modèle qui joue le client, prend du temps et coûte cher. Quand quelque chose rate, impossible de rejouer exactement la même situation. Et le faux client fait ses propres erreurs : on ne sait plus qui on teste.
 
-Aucune de ces erreurs ne se voit en relisant le prompt. Elles ne se voient qu'en mesurant.
+### Le code rattrape le modèle… et embellit les chiffres
 
-### Les appels simulés : lents, chers, et le faux client se trompe aussi
+J'ai ajouté des garde-fous dans le code pour bloquer certaines mauvaises réponses. Très bien pour les vrais clients, mais dans les tests, le résultat final est bon alors que le modèle s'était trompé. Je comptais ces rattrapages comme des réussites du modèle.
 
-Ma première méthode de test était de simuler des appels complets : un deuxième modèle joue le client, mon agent répond, et je vérifie la commande à la fin.
+### Les tests vieillissent sans prévenir
 
-C'est utile, mais :
+Une conversation enregistrée puis rejouée telle quelle ne reste pas valable longtemps : le code et le prompt changent. Un vieux test peut continuer à passer alors qu'il ne teste plus rien de réel.
 
-- un appel complet prend plusieurs minutes et des dizaines d'appels au modèle ;
-- quand quelque chose rate, impossible de rejouer exactement la même situation : le faux client dira autre chose la fois suivante ;
-- le faux client fait lui-même des erreurs. Sur une série de 100 appels, 7 commandes étaient fausses… et aucune par la faute de mon agent : c'était le faux client qui avait oublié un plat ou mal répondu.
+## Comment goldenline m'aide
 
-Quand le testeur se trompe autant que le testé, difficile de savoir ce qu'on mesure.
+J'ai fini par construire un outil pour ça, puis je l'ai extrait de mon projet et publié en open source : [goldenline](https://github.com/stonetech-pxia/goldenline).
 
-### Le code qui rattrape le modèle… et embellit les chiffres
+L'idée : figer le début d'une conversation, et ne tester **qu'une seule phrase** du client.
 
-Pour limiter les dégâts, j'ai ajouté des garde-fous dans le code : si le modèle annonce un plat sans l'avoir cherché, ou dit « c'est noté » sans avoir enregistré la commande, le code bloque la réponse et lui demande de recommencer.
+![Un cas : ce qui est figé et ce qui tourne sur le code d'aujourd'hui](../../assets/golden-set-agent-vocal/fige-vs-direct.svg)
 
-Très bien pour les vrais clients. Mais pour les tests, c'est un piège : le résultat final est bon, donc le test passe — alors que le modèle, lui, s'était trompé. Dans un cas, un contrôle automatique avait bloqué la réponse du modèle 6 fois, et 3 des réussites n'étaient dues qu'à ce rattrapage. Je les comptais comme des réussites du modèle.
+### Figer seulement les réponses du modèle
 
-### Des tests qui vieillissent sans prévenir
+L'historique est enregistré une fois, en parlant avec le vrai agent. Si l'agent s'y trompe, j'annule la phrase et je la refais : l'historique ne contient aucune erreur, seule la dernière phrase est testée.
 
-Dernier problème : enregistrer une conversation et la rejouer telle quelle ne marche pas longtemps. Le code change, le prompt change, la façon dont les résultats des outils sont présentés change. Un vieux test peut continuer à passer alors qu'il ne teste plus du tout la situation actuelle.
-
-## L'idée : figer la conversation, ne tester qu'une phrase
-
-J'ai fini par construire ce que j'appelle mon « golden set » : un ensemble de cas de test de référence, environ 335 aujourd'hui.
-
-Chaque cas, c'est :
-
-- le début d'une conversation (l'**historique**) ;
-- **une** phrase du client à tester ;
-- ce que l'agent doit faire sur cette phrase, vérifié par du code.
-
-Par exemple : le client a commandé un bento, donné son nom, puis dit « Et la sauce, sans gluten s'il vous plaît, je suis cœliaque. » L'agent doit transférer l'appel à quelqu'un du restaurant, parce que c'est une question de santé.
-
-![Un cas du golden set : ce qui est figé et ce qui tourne sur le code d'aujourd'hui](../../assets/golden-set-agent-vocal/fige-vs-direct.svg)
-
-### Un historique enregistré une fois, et propre
-
-L'historique n'est pas tiré des appels simulés. Je l'enregistre avec le vrai agent, phrase par phrase, en jouant le client — ou plutôt en le faisant jouer à Claude Code.
-
-Si l'agent fait une erreur dans l'historique (il confirme un plat sans l'avoir cherché, par exemple), j'annule la dernière phrase et je la refais. À la fin, l'historique ne contient aucune erreur de l'agent : la seule chose testée, c'est la dernière phrase.
-
-### Rejouer avec le code d'aujourd'hui
-
-C'est le point le plus important. Lors de la relecture, seules **les réponses du modèle** dans l'historique sont figées. Tout le reste tourne sur le code actuel :
-
-- le prompt et ses règles, dans leur version du jour ;
-- les notes que le code insère dans la conversation (la langue du client, la relecture de la commande…) ;
-- les outils, ré-exécutés pour de vrai sur un menu de test fixe, avec leurs résultats présentés comme aujourd'hui.
-
-Puis la phrase testée part au vrai modèle, en direct. Si je change une règle, c'est donc la nouvelle règle que le modèle lit au moment de répondre.
+À la relecture, seules les réponses du modèle sont figées. Tout le reste tourne sur le code du jour : le prompt, ce que le code ajoute à la conversation, les outils. Puis la phrase testée part au vrai modèle. Si je change une règle, c'est la nouvelle règle qu'il lit.
 
 ### Le contrôle « périmé »
 
-Reste le problème des tests qui vieillissent. Pendant la relecture, chaque fois que le code d'aujourd'hui demande une réponse au modèle, on lui sert la réponse enregistrée, dans l'ordre.
-
-Si le code demande une réponse de plus, une de moins, ou demande au modèle de réfléchir là où il ne réfléchissait pas, alors l'historique ne correspond plus au code. Le cas est marqué **périmé** : ni réussi, ni échoué. Il faut le réenregistrer.
+Pendant la relecture, chaque fois que le code demande une réponse au modèle, on lui sert la réponse enregistrée. Si le code en demande une de plus, une de moins, ou change de mode de réflexion, l'historique ne correspond plus au code : le cas est **périmé**, ni réussi ni échoué, et il faut le réenregistrer.
 
 ![Rejouer un cas : la réponse enregistrée est servie au code d'aujourd'hui, avec le contrôle « périmé »](../../assets/golden-set-agent-vocal/relecture.svg)
 
-En pratique, changer une règle sans rapport avec un cas ne le rend pas périmé. Ce sont surtout les changements de code qui le font. Et toute cette relecture n'appelle aucun modèle : elle est gratuite.
+Cette relecture n'appelle aucun modèle : elle est gratuite.
 
-### Juger par du code, par paires
+### Juger par du code, par paires, plusieurs fois
 
-Le résultat attendu est vérifié par du code, pas par un autre LLM : l'outil a-t-il été appelé ? Quelles lignes la commande contient-elle ? La réponse pose-t-elle une question ?
+- Le résultat attendu est vérifié par du code, pas par un autre LLM : tel outil a-t-il été appelé, la commande contient-elle les bonnes lignes ?
+- Les cas vont par paires : sur le même historique, une phrase où l'agent doit agir, une où il ne doit pas. Sans le jumeau, un agent qui fait toujours la même chose passerait le test.
+- Chaque cas tourne plusieurs fois, et on compare des taux avant et après un changement :
 
-Un cas ressemble à ça (simplifié) :
-
-```json
-{
-  "id": "handoff_celiac",
-  "rule": "R5",
-  "why": "Un « sans » demandé pour une raison de santé passe à une personne.",
-  "pair": "stay_without_preference",
-  "history": ["… la conversation enregistrée …"],
-  "line": "Et la sauce, sans gluten s'il vous plaît, je suis cœliaque.",
-  "expect": { "calls": "handoff_to_human" }
-}
+```bash
+python -m goldenline compare avant.json apres.json
 ```
-
-Trois détails comptent :
-
-- **Des paires.** Autant que possible, chaque cas a un jumeau sur le même historique : une phrase où l'agent doit faire quelque chose, une où il ne doit pas. « Sans gluten, je suis cœliaque » doit partir vers une personne ; un simple « sans wasabi » doit juste finir dans la commande. Sans le jumeau, un agent qui transfère tout passerait le test.
-- **Une règle par cas.** Chaque cas indique la règle du prompt qu'il teste. Un rapport de couverture liste les règles qui n'ont encore aucun cas.
-- **Je valide le résultat attendu** avant que le cas compte.
-
-### Répéter, toujours
-
-Chaque cas tourne plusieurs fois (souvent 5 ou 10). On ne regarde pas « passe / ne passe pas », mais « 9 fois sur 10 », et on compare avant et après un changement, sur la même liste de cas.
 
 ### Quatre verdicts, pas deux
 
 ![Quatre verdicts : périmé, échoué, réussi grâce au code, réussi](../../assets/golden-set-agent-vocal/verdicts.svg)
 
-- **Réussi** : le modèle a fait juste, tout seul.
-- **Réussi grâce au code** : le résultat est bon, mais seulement parce qu'un garde-fou a bloqué une mauvaise réponse en chemin. Ça compte comme une erreur du modèle.
-- **Échoué** : le résultat n'est pas celui attendu.
-- **Périmé** : l'historique ne correspond plus au code, le cas ne compte pas.
+Un résultat obtenu seulement parce qu'un garde-fou a bloqué une mauvaise réponse est compté à part : c'est une erreur du modèle, pas une réussite.
 
-Le résumé d'une série donne donc deux chiffres : le total des réussites, et celles que le modèle a obtenues seul.
+## Récapitulatif
 
-### Demander avant de dépenser
+| Difficulté                        | Réponse de goldenline                            |
+| --------------------------------- | ------------------------------------------------ |
+| Le modèle varie                   | Chaque cas tourne plusieurs fois                 |
+| Une correction en casse une autre | Cas relancés avant et après chaque changement    |
+| Appels simulés lents et bruités   | Historique figé et propre, une seule phrase      |
+| Le code rattrape le modèle        | Verdict « réussi grâce au code », compté à part  |
+| Les tests vieillissent            | Contrôle « périmé »                              |
 
-Enregistrer un historique et lancer une série appellent le vrai modèle, donc ça coûte de l'argent. L'outil annonce d'abord combien d'appels il va faire et attend un « yes » avant de commencer.
+## Les limites
 
-Pour donner un ordre d'idée : 127 cas joués 10 fois chacun m'ont coûté environ un dollar avec DeepSeek.
-
-## Ce que ça a changé
-
-Premier exemple : un cas où le client finit sa commande et pose une question dans la même phrase. En mode réponse rapide (sans réflexion), le modèle réussissait 2 fois sur 10. Avec la réflexion activée à chaque réponse, 10 fois sur 10. Or les vrais appels réfléchissaient déjà à chaque réponse : mes tests mesuraient un chemin que plus aucun client ne prenait. Depuis, les tests suivent le mode des vrais appels.
-
-Deuxième exemple : la vieille phrase de l'en-tête de la carte, celle qui laissait le modèle répondre de mémoire. Ce sont les cas de recherche qui l'ont pointée du doigt. Une fois la phrase corrigée, les trois cas qui échouaient sont passés à 30 réussites sur 30.
-
-Et surtout, ça a changé ma façon de modifier le prompt :
-
-- avant un changement, je relance les cas des règles concernées : c'est ma base de comparaison ;
-- je cherche d'abord si une règle existante parle déjà de la même décision : si oui, je la réécris ou je la supprime au lieu d'en ajouter une à côté ;
-- le nombre de mots des règles est plafonné par un test (autour de 1 900 mots aujourd'hui) : un changement doit en retirer autant qu'il en ajoute, ou justifier pourquoi le prompt grandit.
-
-Voici le récapitulatif :
-
-| Difficulté                         | Réponse du golden set                                |
-| ---------------------------------- | ---------------------------------------------------- |
-| Le modèle varie                    | Chaque cas tourne plusieurs fois                     |
-| Une correction en casse une autre  | Cas liés aux règles, relancés avant et après         |
-| Appels simulés lents et bruités    | Historique figé et propre, une seule phrase testée   |
-| Le code rattrape le modèle         | Verdict « réussi grâce au code », compté à part      |
-| Les tests vieillissent             | Contrôle « périmé »                                  |
-
-## Les limites de cette méthode
-
-D'abord, un historique figé ne teste pas ce qui s'accumule sur plusieurs tours : l'agent qui tourne en rond, ou qui repose trois fois la même question. Pour ça, je garde les appels simulés complets.
-
-Ensuite, enregistrer un cas propre prend du temps, et un cas périmé doit être réenregistré à la main.
-
-Tout ne se juge pas non plus par du code. « La réponse est-elle claire et polie ? » reste à lire, par moi ou par Claude Code.
-
-Enfin, ça ne teste que le « cerveau » de l'agent : ni la transcription de la voix, ni la voix de synthèse.
+Un historique figé ne teste pas ce qui s'accumule sur plusieurs tours, comme un agent qui tourne en rond : pour ça, je garde quelques appels simulés complets. Et tout ne se juge pas par du code : la clarté d'une réponse reste à lire.
 
 ## Conclusion
 
-Ce que j'en retiens : avec un LLM, on ne teste pas une réponse, on mesure un taux. Et pour mesurer un taux sur une seule décision, il faut pouvoir remettre l'agent exactement dans la même situation — mais avec le code d'aujourd'hui, pas celui du jour de l'enregistrement.
+Avec un LLM, on ne teste pas une réponse, on mesure un taux. Et pour mesurer un taux sur une seule décision, il faut remettre l'agent exactement dans la même situation, mais avec le code d'aujourd'hui.
 
-Je n'ai pas trouvé d'outil open source qui fasse exactement ça : la plupart rejouent des historiques figés sans vérifier qu'ils correspondent encore au code. J'ai donc extrait le mécanisme de mon projet et je l'ai publié en open source : [goldenline](https://github.com/stonetech-pxia/goldenline).
-
-C'est un petit paquet Python, sans dépendance : la relecture et le contrôle « périmé », les vérifications par du code, les verdicts qui séparent « réussi » de « réussi grâce au code », et la comparaison avant / après entre deux séries. Il s'intègre à pytest : un cas périmé y apparaît comme ignoré, et les tests qui appellent le vrai modèle ne tournent que si on le demande. Le dépôt contient un petit agent de commande de pizzas pour l'essayer.
+Le dépôt contient un petit agent de commande de pizzas pour essayer : [goldenline sur GitHub](https://github.com/stonetech-pxia/goldenline).
