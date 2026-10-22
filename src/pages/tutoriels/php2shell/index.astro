@@ -1,0 +1,16 @@
+---
+import Tutorial from '../../../layouts/Tutorial.astro';
+import { pages, tutorial } from '../../../tutoriels/php2shell/meta';
+import content from '../../../tutoriels/php2shell/home.html?raw';
+---
+
+<Tutorial
+	lang="en"
+	title="Does your website run on PHP? Update it now."
+	description={tutorial.description}
+	lead="A large share of websites (WordPress, PrestaShop, Joomla, Drupal, Laravel…) run on PHP. The two flaws let an attacker take control of the server remotely, without a password."
+	tutorial={tutorial}
+	pages={pages}
+>
+	<Fragment set:html={content} />
+</Tutorial>

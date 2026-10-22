@@ -1,0 +1,18 @@
+---
+import Tutorial from '../../../layouts/Tutorial.astro';
+import { pages, tutorial } from '../../../tutoriels/php2shell/meta';
+import content from '../../../tutoriels/php2shell/non-technical.html?raw';
+---
+
+<Tutorial
+	lang="en"
+	title="Protect my website without being technical"
+	description="A guided path to protect your website against the PHP2Shell vulnerabilities without technical knowledge: ready-to-send messages and a prompt for ChatGPT."
+	lead="Don't panic. Answer the first question: what follows tells you what to do, step by step."
+	tutorial={tutorial}
+	pages={pages}
+>
+	<Fragment set:html={content} />
+</Tutorial>
+
+<script src="../../../scripts/sos-php.js"></script>

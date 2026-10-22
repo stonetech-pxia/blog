@@ -1,0 +1,18 @@
+---
+import Tutorial from '../../../layouts/Tutorial.astro';
+import { pages, tutorial } from '../../../tutoriels/php2shell/meta';
+import content from '../../../tutoriels/php2shell/developers.html?raw';
+---
+
+<Tutorial
+	lang="en"
+	title="Developer guide: fixing PHP2Shell"
+	description="Fixed versions, update commands for each environment, temporary mitigations and checks for CVE-2026-109618 and CVE-2026-109619."
+	lead="CVE-2026-109618 and CVE-2026-109619 · unauthenticated RCE · CVSS v4.0 9.2 · updated 22 Oct 2026"
+	tutorial={tutorial}
+	pages={pages}
+>
+	<Fragment set:html={content} />
+</Tutorial>
+
+<script src="../../../scripts/sos-php.js"></script>

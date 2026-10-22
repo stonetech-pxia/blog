@@ -10,13 +10,14 @@ interface Props {
 	lead: string;
 	tutorial: { title: string; href: string };
 	pages: { label: string; href: string }[];
+	lang?: 'fr' | 'en';
 }
 
-const { title, description, lead, tutorial, pages } = Astro.props;
+const { title, description, lead, tutorial, pages, lang = 'fr' } = Astro.props;
 const current = Astro.url.pathname.replace(/\/?$/, '/');
 ---
 
-<html lang="fr">
+<html lang={lang}>
 	<head>
 		<BaseHead title={`${title} – ${tutorial.title}`} description={description} />
 		<style>
@@ -76,7 +77,7 @@ const current = Astro.url.pathname.replace(/\/?$/, '/');
 			<article class="prose">
 				<div class="post-head">
 					<div class="eyebrow">
-						<a href="/tutoriels/">Tutoriels</a> · {tutorial.title}
+						<a href="/tutoriels/">{lang === 'en' ? 'Tutorials' : 'Tutoriels'}</a> · {tutorial.title}
 					</div>
 					<h1>{title}</h1>
 					<p class="lede">{lead}</p>

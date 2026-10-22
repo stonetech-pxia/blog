@@ -1,0 +1,65 @@
+  <div class="box danger">
+    <strong>Alert – 21 October 2026.</strong> PHP has released emergency fixes for two critical vulnerabilities
+    nicknamed <strong>PHP2Shell</strong>. An attack attempt was seen on 17 October, before the public announcement.
+  </div>
+
+  <p><strong>Is your website built with WordPress, WooCommerce, PrestaShop, Joomla or Drupal?</strong> Then it runs on PHP, and you are affected.
+    On regular web hosting (Hostinger, IONOS, Bluehost, SiteGround, OVHcloud…), the host usually installs the fix:
+    your job is to check that it has been done.</p>
+
+  <h2>Where to start</h2>
+  <div class="cards">
+    <a class="card" href="/tutoriels/php2shell/developers/">
+      <strong>I'm a developer or sysadmin →</strong>
+      Diagnosis, updating on your system, pitfalls to avoid, temporary mitigations and checks.
+    </a>
+    <a class="card" href="/tutoriels/php2shell/non-technical/">
+      <strong>I'm not technical →</strong>
+      What to do in your situation, with ready-to-send messages for your host and a text to paste into ChatGPT, Claude, Mistral or Gemini if you'd like to be guided.
+    </a>
+  </div>
+
+  <h2>In short</h2>
+  <div class="table-scroll">
+    <table>
+      <tr><th>Vulnerabilities</th><td>CVE-2026-109618 and CVE-2026-109619 ("PHP2Shell")</td></tr>
+      <tr><th>Severity</th><td>Critical – 9.2 / 10 (CVSS v4.0)</td></tr>
+      <tr><th>Impact</th><td>An attacker can take control of the server without a password, whatever the application (remote code execution)</td></tr>
+      <tr><th>Vulnerable versions</th><td>Every version older than the fixed versions below, including old branches (5.x, 7.x, 8.0, 8.1)</td></tr>
+      <tr><th>Fixed versions</th><td><strong>8.2.35 · 8.3.36 · 8.4.27 · 8.5.12</strong> (or later)</td></tr>
+      <tr><th>PHP 8.1 and older</th><td>No longer maintained by PHP. If your Linux distribution still ships it (Ubuntu 22.04, RHEL 8 and 9…), it publishes its own fix.
+        Otherwise: source-only patches for 7.4, 8.0 and 8.1, paid extended support, or moving to 8.2 at least.</td></tr>
+      <tr><th>Fix</th><td>Updating is the <strong>only complete protection</strong>. Workaround settings only protect partly.</td></tr>
+    </table>
+  </div>
+
+  <h2>Why it's serious, in plain words</h2>
+  <p>
+    Think of your website as a shop. With these flaws, the burglar doesn't need to break the window:
+    they already have <strong>the keys to the back room</strong>. They can steal your customers' data,
+    install malware, send spam from your server or wipe your website.
+  </p>
+  <p>
+    They need neither a password nor a mistake on your part: it is enough that your server runs an unpatched version of PHP.
+    Some websites even went into maintenance mode while they updated.
+  </p>
+
+  <div class="box warn">
+    <strong>Watch out for fake tools.</strong> Fake "vulnerability checker" programs are already circulating on GitHub and contain malicious code.
+    Never run a script you don't understand or whose origin you don't know.
+    <strong>This guide will never ask you to download a detection tool.</strong> It only uses standard commands, explained one by one, and your host's own tools.
+  </div>
+
+  <h2>Official sources</h2>
+  <ul>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w">PHP security advisory – CVE-2026-109618 (GitHub)</a></li>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp">PHP security advisory – CVE-2026-109619 (GitHub)</a></li>
+    <li><a href="https://www.php.net/downloads.php">PHP downloads (php.net)</a></li>
+    <li><a href="https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching">CISA alert of 21 October 2026</a></li>
+    <li><a href="https://www.helpnetsecurity.com/2026/10/21/php2shell-php-vulnerabilities-patched-cve-2026-109618-cve-2026-109619/">Help Net Security – technical summary</a></li>
+  </ul>
+
+  <p class="tuto-note">
+    Information last updated: 22 October 2026. The situation is changing: always check the official sources above.
+    This is an independent prevention initiative, not affiliated with the PHP project. The guides come with no warranty: back up before you change anything.
+  </p>
