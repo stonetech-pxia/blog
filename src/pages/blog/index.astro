@@ -13,110 +13,83 @@ const posts = (await getCollection('blog')).sort(
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
-			main {
-				width: 960px;
+			.page-head {
+				padding-block: 72px 48px;
 			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
+			.page-head h1 {
 				margin: 0;
-				padding: 0;
 			}
-			ul li {
-				width: calc(50% - 1rem);
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 16px;
 			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
+			.card img {
 				display: block;
-				transition: transform 0.25s ease;
+				width: 100%;
+				aspect-ratio: 2 / 1;
+				object-fit: cover;
+				border: 1px solid var(--divider);
 			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-				text-decoration: underline;
-				text-decoration-color: transparent;
-				text-underline-offset: 4px;
-				transition: text-decoration-color 0.25s ease;
+			.card .title {
+				font-size: var(--t-xl);
 			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
+			.card:first-child {
+				grid-column: span 2;
+				display: grid;
+				grid-template-columns: 1.3fr 1fr;
+				align-items: center;
+				column-gap: 32px;
 			}
-			ul li a:hover {
-				transform: translateY(-4px);
+			.card:first-child img {
+				grid-row: span 3;
 			}
-			ul li a:hover .title {
-				text-decoration-color: rgb(var(--black));
-			}
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
+			@media (max-width: 760px) {
+				.page-head {
+					padding-block: 48px 32px;
 				}
-				ul li {
-					width: 100%;
-					text-align: center;
+				.grid {
+					grid-template-columns: 1fr;
 				}
-				ul li:first-child {
-					margin-bottom: 0;
+				.card:first-child {
+					grid-column: span 1;
+					display: flex;
 				}
-				ul li:first-child .title {
-					font-size: 1.563em;
+				.card .title {
+					font-size: var(--t-lg);
 				}
 			}
 		</style>
 	</head>
 	<body>
 		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
+		<main class="wrap">
+			<div class="page-head">
+				<div class="eyebrow">Blog</div>
+				<h1>Tous les articles</h1>
+				<p class="lede">Astuces concrètes pour tirer le meilleur parti des agents de coding au quotidien.</p>
+			</div>
+			<section class="grid">
+				{
+					posts.map((post) => (
+						<a class="card" href={`/blog/${post.id}/`}>
+							{post.data.heroImage && (
+								<Image width={720} height={360} src={post.data.heroImage} alt="" />
+							)}
+							<span class="meta">
+								<FormattedDate date={post.data.pubDate} />
+							</span>
+							<div>
+								<h2 class="title">{post.data.title}</h2>
+								<p class="card-text">{post.data.description}</p>
+							</div>
+						</a>
+					))
+				}
 			</section>
 		</main>
 		<Footer />

@@ -20,61 +20,51 @@ const current = Astro.url.pathname.replace(/\/?$/, '/');
 	<head>
 		<BaseHead title={`${title} – ${tutorial.title}`} description={description} />
 		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
+			.post-head {
+				padding-block: 72px 32px;
+			}
+			.post-head h1 {
 				margin: 0;
+				font-size: clamp(34px, 4.6vw, var(--t-2xl));
+				line-height: 1.08;
 			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
+			.post-head .lede {
+				margin-bottom: 0;
 			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0 0;
-				text-align: center;
+			.eyebrow a {
+				color: inherit;
 			}
-			.title h1 {
-				margin: 0 0 0.4em 0;
-				font-size: 2.441em;
-			}
-			.crumb {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.crumb a {
-				color: rgb(var(--gray));
-			}
-			.lead {
-				color: rgb(var(--gray));
-				font-size: 1.1em;
-			}
-			.tuto-nav {
-				display: flex;
+			.seg {
+				display: inline-flex;
 				flex-wrap: wrap;
-				justify-content: center;
-				gap: 0.25em 1em;
-				margin: 0 0 2em;
-				padding: 0.5em 0;
-				border-top: 1px solid rgb(var(--gray-light));
-				border-bottom: 1px solid rgb(var(--gray-light));
+				gap: 4px;
+				margin: 0 0 40px;
+				padding: 4px;
+				background: var(--surface-2);
+				border-radius: var(--r-control);
 			}
-			.tuto-nav a {
-				padding: 0.25em 0.5em;
-				color: rgb(var(--black));
+			.seg a {
+				display: inline-flex;
+				align-items: center;
+				min-height: 40px;
+				padding: 0 16px;
+				color: var(--ink-muted);
+				font-size: var(--t-sm);
+				font-weight: 700;
 				text-decoration: none;
-				border-bottom: 4px solid transparent;
+				border-radius: 6px;
 			}
-			.tuto-nav a[aria-current='page'] {
-				font-weight: bolder;
-				border-bottom-color: var(--accent);
+			.seg a:hover {
+				color: var(--ink);
 			}
-			@media (max-width: 720px) {
-				.title h1 {
-					font-size: 1.953em;
+			.seg a[aria-current='page'] {
+				color: var(--ink);
+				background: var(--surface);
+				box-shadow: 0 0 0 1px var(--divider);
+			}
+			@media (max-width: 600px) {
+				.post-head {
+					padding-block: 48px 24px;
 				}
 			}
 		</style>
@@ -84,14 +74,14 @@ const current = Astro.url.pathname.replace(/\/?$/, '/');
 		<Header />
 		<main>
 			<article class="prose">
-				<div class="title">
-					<div class="crumb">
-						<a href="/tutoriels/">Tutoriels</a> › {tutorial.title}
+				<div class="post-head">
+					<div class="eyebrow">
+						<a href="/tutoriels/">Tutoriels</a> · {tutorial.title}
 					</div>
 					<h1>{title}</h1>
-					<p class="lead">{lead}</p>
+					<p class="lede">{lead}</p>
 				</div>
-				<nav class="tuto-nav" aria-label={tutorial.title}>
+				<nav class="seg" aria-label={tutorial.title}>
 					{
 						pages.map((p) => (
 							<a href={p.href} aria-current={p.href === current ? 'page' : undefined}>

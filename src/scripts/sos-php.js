@@ -1,4 +1,4 @@
-// SOS PHP – boutons de copie, parcours non-tech et générateur de prompt.
+// Faille PHP 2026-10-21 – boutons de copie, parcours non-tech et générateur de prompt.
 // Tout s'exécute dans le navigateur : aucune donnée n'est envoyée.
 
 // Faits à jour : à modifier ici (et dans src/tutoriels/sos-php/*.html) si la situation évolue.
@@ -144,17 +144,29 @@ function buildPrompt(d) {
   return lines.join("\n");
 }
 
+// Champ libre affiché quand l'outil du site est « Autre »
+const cmsSelect = document.getElementById("f-cms");
+const cmsAutre = document.getElementById("f-cms-autre");
+if (cmsSelect && cmsAutre) {
+  cmsSelect.addEventListener("change", () => {
+    cmsAutre.hidden = cmsSelect.value !== "Autre";
+    if (!cmsAutre.hidden) cmsAutre.focus();
+  });
+}
+
 const form = document.getElementById("gen-form");
 if (form) {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const { text: precisions, count } = redact(document.getElementById("f-precisions").value.trim());
+    const { text: precisions, count: countPrecisions } = redact(document.getElementById("f-precisions").value.trim());
+    const autre = cmsSelect.value === "Autre" ? redact(cmsAutre.value.trim()) : { text: "", count: 0 };
+    const count = countPrecisions + autre.count;
     const data = {
       version: document.getElementById("f-version").value.trim(),
       precisions,
       gestion: gestionSelect.value,
       hebergeur: document.getElementById("f-hebergeur").value.trim(),
-      cms: document.getElementById("f-cms").value,
+      cms: autre.text ? `Autre (${autre.text})` : cmsSelect.value,
       acces: Array.from(form.querySelectorAll('input[name="acces"]:checked'), (i) => i.value),
       niveau: document.getElementById("f-niveau").value,
       poste: document.getElementById("f-poste").value,

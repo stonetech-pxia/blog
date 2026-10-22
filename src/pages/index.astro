@@ -1,39 +1,187 @@
 ---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import logo from '../assets/stone-cube-logo.svg';
-import { Image } from 'astro:assets';
+import { tutorial as sosPhp } from '../tutoriels/sos-php/meta';
 
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 2);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			.hero {
+				padding-block: 96px 64px;
+			}
+			.hero-grid {
+				display: grid;
+				grid-template-columns: 1.1fr 1fr;
+				grid-template-areas: 'title side' 'cta side';
+				column-gap: 56px;
+				row-gap: 32px;
+			}
+			.hero-title {
+				grid-area: title;
+			}
+			.hero h1 {
+				margin: 0;
+				font-size: clamp(40px, 5.4vw, var(--t-3xl));
+				line-height: 1.04;
+			}
+			.hero-side {
+				grid-area: side;
+				padding-top: 12px;
+				color: var(--ink-muted);
+				font-size: var(--t-lg);
+				line-height: 1.55;
+			}
+			.hero-side p {
+				max-width: 40ch;
+			}
+			.hero-actions {
+				grid-area: cta;
+				display: flex;
+				flex-wrap: wrap;
+				align-content: start;
+				gap: 12px;
+			}
+			.section {
+				padding-block: 72px;
+				border-top: 1px solid var(--divider);
+			}
+			.section-head {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: end;
+				justify-content: space-between;
+				gap: 16px;
+				margin-bottom: 40px;
+			}
+			.section-head h2 {
+				margin: 0;
+				font-size: clamp(var(--t-xl), 3.6vw, var(--t-2xl));
+				line-height: 1.1;
+			}
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 16px;
+			}
+			.card img {
+				display: block;
+				width: 100%;
+				aspect-ratio: 2 / 1;
+				object-fit: cover;
+				border: 1px solid var(--divider);
+			}
+			.card .title {
+				font-size: var(--t-lg);
+			}
+			@media (max-width: 960px) {
+				.grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+			@media (max-width: 860px) {
+				.hero {
+					padding-block: 56px 40px;
+				}
+				.hero-grid {
+					grid-template-columns: 1fr;
+					grid-template-areas: 'title' 'side' 'cta';
+					row-gap: 20px;
+				}
+				.hero-side {
+					padding-top: 0;
+					font-size: var(--t-md);
+				}
+			}
+			@media (max-width: 600px) {
+				.grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-		<h1 style="display: flex; justify-content: center;"><Image src={logo} alt={SITE_TITLE} height={65} />Bonjour à tous ! <Image src={logo} alt={SITE_TITLE} height={65} /></h1>
-		<p>
-			Développeurs, curieux du web et passionnés de tech, bienvenue !
-		</p>
-		<p>
+			<section class="hero wrap">
+				<div class="hero-grid">
+					<div class="hero-title">
+						<div class="eyebrow">{SITE_TITLE}</div>
+						<h1>Bonjour à tous !</h1>
+					</div>
+					<div class="hero-side">
+						<p>Développeurs, curieux du web et passionnés de tech, bienvenue !</p>
+						<p>
+							Les agents de coding font aujourd'hui beaucoup parler d'eux — et pour cause : ils
+							transforment en profondeur notre façon de coder.
+						</p>
+						<p>
+							Dans ce blog, je partage mes astuces concrètes pour tirer le meilleur parti de de ces
+							outils au quotidien.
+						</p>
+						<p>
+							Une question ? Une idée de sujet ? N'hésitez pas à laisser un commentaire en bas des
+							articles, je lis tout et je vous réponds dès que possible !
+						</p>
+					</div>
+					<div class="hero-actions">
+						<a class="btn btn-primary" href="/blog"
+							>Lire le blog <svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg
+							></a
+						>
+						<a class="btn btn-ghost" href="/tutoriels">Voir les tutoriels</a>
+					</div>
+				</div>
+			</section>
 
-			Les agents de coding font aujourd'hui beaucoup parler d'eux — et pour cause :
-			ils transforment en profondeur notre façon de coder.
-		</p>
-		<p>
-			Dans ce blog, je partage mes astuces concrètes pour tirer le meilleur parti de
-			de ces outils au quotidien.
-		</p>
-		<p>
-
-			Une question ? Une idée de sujet ? N'hésitez pas à laisser un commentaire
-			en bas des articles, je lis tout et je vous réponds dès que possible !
-		</p>
+			<section class="section">
+				<div class="wrap">
+					<div class="section-head">
+						<div>
+							<div class="eyebrow">Blog</div>
+							<h2>À lire en ce moment</h2>
+						</div>
+						<a class="btn btn-ghost btn-sm" href="/blog">Tous les articles</a>
+					</div>
+					<div class="grid">
+						{
+							posts.map((post) => (
+								<a class="card" href={`/blog/${post.id}/`}>
+									{post.data.heroImage && <Image width={720} height={360} src={post.data.heroImage} alt="" />}
+									<span class="meta">
+										<FormattedDate date={post.data.pubDate} />
+									</span>
+									<h3 class="title">{post.data.title}</h3>
+									<p class="card-text">{post.data.description}</p>
+								</a>
+							))
+						}
+						<a class="card" href={sosPhp.href}>
+							<span class="meta">Tutoriel</span>
+							<h3 class="title">{sosPhp.title}</h3>
+							<p class="card-text">{sosPhp.description}</p>
+						</a>
+					</div>
+				</div>
+			</section>
 		</main>
 		<Footer />
 	</body>

@@ -1,34 +1,23 @@
-/* Composants des tutoriels, déclinés dans la palette du blog (global.css). */
-
-.tuto {
-	--danger: 180, 35, 24;
-	--warn: 176, 112, 0;
-	--ok: 27, 110, 58;
-}
+/* Composants des tutoriels, déclinés dans le thème Clay (global.css). */
 
 .tuto h2 {
-	font-size: 1.953em;
-	margin: 1.6em 0 0.5em;
+	margin: 2em 0 0.5em;
 }
 .tuto h3 {
-	font-size: 1.25em;
-	margin: 1.2em 0 0.4em;
-}
-.tuto p {
-	margin: 0 0 1em;
+	margin: 1.4em 0 0.4em;
 }
 .tuto .hint {
-	color: rgb(var(--gray));
-	font-size: 0.85em;
+	color: var(--ink-caption);
+	font-size: var(--t-sm);
 }
 
-/* Encadrés : même trait à gauche que les citations du blog */
+/* Encadrés : mêmes pastilles que le statut de docudis */
 .tuto .box {
 	margin: 1em 0;
-	padding: 0.8em 1.1em;
-	border-left: 4px solid var(--accent);
-	border-radius: 0 8px 8px 0;
-	background: rgba(var(--gray-light), 50%);
+	padding: 16px 20px;
+	background: var(--surface);
+	border: 1px solid var(--divider);
+	border-radius: var(--r-card);
 }
 .tuto .box > :first-child,
 .tuto details > div > :first-child {
@@ -42,116 +31,117 @@
 	margin-top: 0;
 }
 .tuto .box.danger {
-	border-left-color: rgb(var(--danger));
-	background: rgba(var(--danger), 7%);
+	color: var(--found-fg);
+	background: var(--found-bg);
+	border-color: transparent;
 }
 .tuto .box.warn {
-	border-left-color: rgb(var(--warn));
-	background: rgba(var(--warn), 9%);
+	color: var(--warn);
+	background: var(--warn-bg);
+	border-color: transparent;
 }
 .tuto .box.ok {
-	border-left-color: rgb(var(--ok));
-	background: rgba(var(--ok), 8%);
+	color: var(--safe);
+	background: var(--safe-bg);
+	border-color: transparent;
+}
+.tuto .box.danger :is(h3, strong, a),
+.tuto .box.warn :is(h3, strong, a),
+.tuto .box.ok :is(h3, strong, a) {
+	color: inherit;
 }
 
-/* Cartes : même survol que la liste des articles */
+/* Cartes d'entrée */
 .tuto .cards {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	gap: 1em;
+	gap: 16px;
 	margin: 1em 0;
-}
-.tuto .card {
-	display: block;
-	padding: 1em 1.2em;
-	color: rgb(var(--gray-dark));
-	text-decoration: none;
-	background: white;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(var(--gray), 20%);
-	transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.tuto .card:hover {
-	transform: translateY(-4px);
-	box-shadow: var(--box-shadow);
 }
 .tuto .card strong {
 	display: block;
-	margin-bottom: 0.3em;
-	color: var(--accent);
-	font-size: 1.1em;
+	color: var(--action);
+	font-family: var(--font-display);
+	font-size: var(--t-lg);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+.tuto .card {
+	display: block;
+	color: var(--ink-muted);
 }
 
-/* Tableaux */
+/* Tableaux : fiche technique comme la section Privacy de docudis */
 .tuto .table-scroll {
-	overflow-x: auto;
 	margin: 1em 0;
+	overflow-x: auto;
 }
 .tuto table {
-	border-collapse: collapse;
-	font-size: 0.85em;
-	line-height: 1.5;
+	font-size: var(--t-sm);
+	line-height: 1.55;
+	border-top: 1px solid var(--ink);
 }
 .tuto th,
 .tuto td {
-	padding: 0.5em 0.7em;
+	padding: 12px 12px 12px 0;
 	text-align: left;
 	vertical-align: top;
-	border-bottom: 1px solid rgb(var(--gray-light));
+	border-bottom: 1px solid var(--divider);
 }
 .tuto th {
-	color: rgb(var(--black));
-	background: rgba(var(--gray-light), 50%);
+	color: var(--ink-muted);
+	font-family: var(--font-mono);
+	font-size: var(--t-xs);
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
 }
 
-/* Code : mêmes couleurs que les blocs Shiki (github-dark) des articles */
+/* Code : panneau sombre du thème */
 .tuto pre {
 	margin: 0.5em 0 1em;
-	padding: 1em 1.2em;
-	overflow-x: auto;
-	color: #e1e4e8;
-	background: #24292e;
-	font-size: 0.75em;
-	line-height: 1.5;
+	font-size: 13px;
+	line-height: 1.6;
 }
 .tuto .code-block {
 	position: relative;
 }
 .tuto .code-block pre {
-	padding-top: 2.2em;
+	padding-top: 44px;
 }
 .tuto .copy-btn {
 	position: absolute;
-	top: 0.5em;
-	right: 0.5em;
-	padding: 0.1em 0.7em;
-	color: #e1e4e8;
-	font: inherit;
-	font-size: 0.7em;
+	top: 8px;
+	right: 8px;
+	min-height: 28px;
+	padding: 0 12px;
+	color: var(--code-fg);
+	font: 700 13px var(--font-body);
 	background: transparent;
-	border: 1px solid #586069;
+	border: 1px solid var(--code-line);
 	border-radius: 6px;
 	cursor: pointer;
 }
 .tuto .copy-btn:hover {
-	border-color: #e1e4e8;
+	border-color: var(--code-dim);
 }
 
 /* Sections repliables */
 .tuto details {
-	margin: 0.6em 0;
-	border: 1px solid rgb(var(--gray-light));
-	border-radius: 8px;
-	background: white;
+	margin: 8px 0;
+	background: var(--surface);
+	border: 1px solid var(--divider);
+	border-radius: var(--r-card);
 }
 .tuto details > summary {
-	padding: 0.6em 1em;
-	color: rgb(var(--black));
-	font-weight: 700;
+	padding: 14px 20px;
+	font-family: var(--font-display);
+	font-weight: 600;
 	cursor: pointer;
 }
 .tuto details > div {
-	padding: 0 1em 0.6em;
+	padding: 0 20px 14px;
+	color: var(--ink-muted);
 }
 
 .tuto .toc {
@@ -162,98 +152,104 @@
 /* Parcours non-tech */
 .tuto .choices {
 	display: grid;
-	gap: 0.6em;
+	gap: 8px;
 	margin: 1em 0;
 }
 .tuto .choice {
 	display: block;
 	width: 100%;
-	padding: 0.8em 1em;
-	color: rgb(var(--gray-dark));
-	font: inherit;
+	padding: 16px 20px;
+	color: var(--ink);
+	font: 700 var(--t-md) var(--font-body);
 	text-align: left;
-	background: white;
-	border: 2px solid rgb(var(--gray-light));
-	border-radius: 12px;
+	background: var(--surface);
+	border: 1px solid var(--divider);
+	border-radius: var(--r-card);
 	cursor: pointer;
-	transition: border-color 0.2s ease;
+	transition: border-color 0.2s;
 }
 .tuto .choice:hover {
-	border-color: var(--accent);
+	border-color: var(--ink-caption);
 }
 .tuto .choice[aria-pressed='true'] {
-	border-color: var(--accent);
-	background: rgba(var(--gray-light), 50%);
+	border-color: var(--action);
+	box-shadow: 0 0 0 1px var(--action);
 }
 .tuto .choice small {
 	display: block;
-	color: rgb(var(--gray));
-	font-size: 0.8em;
+	margin-top: 2px;
+	color: var(--ink-muted);
+	font-size: var(--t-sm);
+	font-weight: 400;
 }
 
 .tuto .step-num {
-	display: inline-block;
-	min-width: 1.6em;
-	height: 1.6em;
-	margin-right: 0.4em;
-	color: white;
-	font-size: 0.8em;
-	line-height: 1.6em;
-	text-align: center;
+	display: inline-grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	margin-right: 12px;
+	color: var(--ink);
+	font-size: var(--t-md);
 	vertical-align: middle;
-	background: var(--accent);
-	border-radius: 50%;
+	background: var(--surface-2);
+	border-radius: var(--r-control);
 }
 
 /* Générateur de prompt */
 .tuto form.gen {
 	display: grid;
-	gap: 1em;
+	gap: 20px;
+	padding: 28px;
 }
 .tuto form.gen label {
 	display: block;
-	margin-bottom: 0.2em;
-	color: rgb(var(--black));
+	margin-bottom: 4px;
 	font-weight: 700;
 }
 .tuto form.gen input,
 .tuto form.gen select,
 .tuto form.gen textarea {
 	width: 100%;
-	padding: 0.4em 0.6em;
-	color: rgb(var(--gray-dark));
+	min-height: 44px;
+	padding: 8px 12px;
+	color: var(--ink);
 	font: inherit;
 	font-size: 16px;
-	background: white;
-	border: 1px solid rgb(var(--gray));
-	border-radius: 8px;
-	box-sizing: border-box;
+	background: var(--bg);
+	border: 1px solid var(--divider);
+	border-radius: var(--r-control);
+}
+.tuto form.gen select + input {
+	margin-top: 8px;
+}
+.tuto form.gen input[type='checkbox'] {
+	min-height: 0;
+	margin-right: 6px;
+	accent-color: var(--action);
 }
 
+/* Boutons du contenu migré : même rendu que .btn-primary / .btn-ghost */
 .tuto .btn {
-	display: inline-block;
-	margin: 0 0.3em 0.4em 0;
-	padding: 0.4em 1.1em;
-	color: white;
-	font: inherit;
-	font-weight: 700;
-	text-decoration: none;
-	background: var(--accent);
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
+	min-height: 48px;
+	margin: 0 6px 8px 0;
+	color: var(--on-action);
+	background: var(--action);
 }
 .tuto .btn:hover {
-	color: white;
-	background: var(--accent-dark);
+	color: var(--on-action);
+	background: var(--action-hover);
 }
 .tuto .btn.secondary {
-	color: rgb(var(--black));
-	background: white;
-	border: 1px solid rgb(var(--gray-light));
+	min-height: 40px;
+	padding: 0 16px;
+	color: var(--ink);
+	font-size: var(--t-sm);
+	background: transparent;
+	border-color: var(--divider);
 }
 .tuto .btn.secondary:hover {
-	border-color: var(--accent);
+	border-color: var(--ink-caption);
 }
 
 .tuto #prompt-out {
@@ -266,9 +262,9 @@
 }
 
 .tuto .tuto-note {
-	margin-top: 3em;
-	padding-top: 1em;
-	color: rgb(var(--gray));
-	font-size: 0.8em;
-	border-top: 1px solid rgb(var(--gray-light));
+	margin-top: 48px;
+	padding-top: 20px;
+	color: var(--ink-caption);
+	font-size: var(--t-sm);
+	border-top: 1px solid var(--divider);
 }

@@ -5,62 +5,118 @@ import { Image } from 'astro:assets';
 import logo from '../assets/stone-cube-logo.svg';
 ---
 
-<header>
-	<nav>
-		<h2>
-			<a href="/">
-				<Image src={logo} alt={SITE_TITLE} height={65} /> Blog
-			</a>
-		</h2>
-		<div class="internal-links">
+<header class="nav">
+	<div class="wrap">
+		<a class="brand" href="/">
+			<Image src={logo} alt="" width={30} height={30} />
+			<span>{SITE_TITLE}</span>
+		</a>
+		<nav class="nav-links" aria-label="Principal">
 			<HeaderLink href="/">Accueil</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/tutoriels">Tutoriels</HeaderLink>
 			<HeaderLink href="/about">À propos de moi</HeaderLink>
+		</nav>
+		<div class="nav-right">
+			<a class="icon-btn gh" href="https://github.com/stonetech-pxia" aria-label="GitHub">
+				<svg viewBox="0 0 24 24" aria-hidden="true"
+					><path
+						fill="currentColor"
+						d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"
+					></path></svg
+				>
+			</a>
+			<button class="icon-btn" id="theme-toggle" type="button" aria-label="Passer en thème clair ou sombre">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"
+					><circle cx="12" cy="12" r="4"></circle><path
+						d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+					></path></svg
+				>
+			</button>
 		</div>
-		<div class="social-links">
-		</div>
-	</nav>
+	</div>
 </header>
-<style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-		background: white;
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
 
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
+<script>
+	// Inverse le thème effectif, le mémorise et prévient les commentaires Giscus.
+	const root = document.documentElement;
+	document.getElementById('theme-toggle')?.addEventListener('click', () => {
+		const dark = root.dataset.theme
+			? root.dataset.theme === 'dark'
+			: matchMedia('(prefers-color-scheme: dark)').matches;
+		const next = dark ? 'light' : 'dark';
+		root.dataset.theme = next;
+		try {
+			localStorage.setItem('theme', next);
+		} catch {}
+		document
+			.querySelector<HTMLIFrameElement>('iframe.giscus-frame')
+			?.contentWindow?.postMessage({ giscus: { setConfig: { theme: next } } }, 'https://giscus.app');
+	});
+</script>
+
+<style>
+	.nav {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background: color-mix(in srgb, var(--bg) 90%, transparent);
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid var(--divider);
+	}
+	.nav .wrap {
 		display: flex;
 		align-items: center;
+		gap: 32px;
+		height: 68px;
 	}
-	nav {
+	.brand {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-	}
-	nav a {
-		padding: 0.5em 0.5em;
-		color: var(--black);
-		border-bottom: 4px solid transparent;
+		gap: 10px;
+		color: var(--ink);
+		font-family: var(--font-display);
+		font-size: var(--t-lg);
+		font-weight: 700;
+		letter-spacing: -0.02em;
 		text-decoration: none;
+		white-space: nowrap;
 	}
-	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
+	.brand:hover {
+		color: var(--ink);
 	}
-	.social-links,
-	.social-links a {
+	.brand img {
+		flex: none;
+		width: 30px;
+		height: 30px;
+		border-radius: 0;
+		filter: none;
+	}
+	.nav-links {
 		display: flex;
+		gap: 24px;
 	}
-	@media (max-width: 720px) {
-		.social-links {
+	.nav-right {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-left: auto;
+	}
+	@media (max-width: 760px) {
+		.nav .wrap {
+			flex-wrap: wrap;
+			gap: 0 16px;
+			height: auto;
+			padding-top: 12px;
+		}
+		.nav-links {
+			order: 3;
+			width: 100%;
+			gap: 20px;
+			overflow-x: auto;
+			scrollbar-width: none;
+		}
+		.gh {
 			display: none;
 		}
 	}

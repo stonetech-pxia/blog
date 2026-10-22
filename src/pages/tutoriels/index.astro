@@ -16,98 +16,55 @@ const tutorials = [sosPhp];
 			description="Des guides pas à pas, pour les développeurs comme pour les non-techniciens."
 		/>
 		<style>
-			main {
-				width: 960px;
+			.page-head {
+				padding-block: 72px 48px;
 			}
-			h1 {
-				margin-bottom: 0.2em;
-				text-align: center;
-			}
-			.intro {
-				margin-bottom: 2em;
-				color: rgb(var(--gray));
-				text-align: center;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
+			.page-head h1 {
 				margin: 0;
-				padding: 0;
 			}
-			ul li {
-				width: calc(50% - 1rem);
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 16px;
 			}
-			ul li a {
-				display: block;
-				padding: 1.2em 1.4em;
-				text-decoration: none;
-				background: white;
-				border-radius: 12px;
-				box-shadow: 0 2px 8px rgba(var(--gray), 20%);
-				transition: transform 0.25s ease, box-shadow 0.25s ease;
+			@media (max-width: 960px) {
+				.grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
 			}
-			.title {
-				margin: 0 0 0.3em;
-				color: rgb(var(--black));
-				line-height: 1;
-				text-decoration: underline;
-				text-decoration-color: transparent;
-				text-underline-offset: 4px;
-				transition: text-decoration-color 0.25s ease;
-			}
-			.description {
-				margin: 0 0 0.5em;
-				color: rgb(var(--gray-dark));
-				font-size: 0.9em;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-				font-size: 0.9em;
-			}
-			ul li a:hover {
-				transform: translateY(-4px);
-				box-shadow: var(--box-shadow);
-			}
-			ul li a:hover .title {
-				text-decoration-color: rgb(var(--black));
-			}
-			ul li a:hover .date {
-				color: var(--accent);
-			}
-			@media (max-width: 720px) {
-				ul li {
-					width: 100%;
+			@media (max-width: 600px) {
+				.page-head {
+					padding-block: 48px 32px;
+				}
+				.grid {
+					grid-template-columns: 1fr;
 				}
 			}
 		</style>
 	</head>
 	<body>
 		<Header />
-		<main>
-			<h1>Tutoriels</h1>
-			<p class="intro">Des guides pas à pas, pour les développeurs comme pour les non-techniciens.</p>
-			<section>
-				<ul>
-					{
-						tutorials.map((t) => (
-							<li>
-								<a href={t.href}>
-									<h4 class="title">{t.title}</h4>
-									<p class="description">{t.description}</p>
-									<p class="date">
-										Mis à jour le{' '}
-										<time datetime={t.updatedDate.toISOString()}>
-											{t.updatedDate.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
-										</time>
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
+		<main class="wrap">
+			<div class="page-head">
+				<div class="eyebrow">Tutoriels</div>
+				<h1>Guides pas à pas</h1>
+				<p class="lede">Pour les développeurs comme pour les non-techniciens.</p>
+			</div>
+			<section class="grid">
+				{
+					tutorials.map((t) => (
+						<a class="card" href={t.href}>
+							<span class="meta">
+								Mis à jour le{' '}
+								<time datetime={t.updatedDate.toISOString()}>
+									{t.updatedDate.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
+								</time>
+							</span>
+							<h2 class="title">{t.title}</h2>
+							<p class="card-text">{t.description}</p>
+						</a>
+					))
+				}
 			</section>
 		</main>
 		<Footer />

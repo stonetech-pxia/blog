@@ -11,20 +11,30 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.local(),
-      name: "Atkinson",
-      cssVariable: "--font-atkinson",
+      name: "Sora",
+      cssVariable: "--font-sora",
       fallbacks: ["sans-serif"],
       options: {
         variants: [
           {
-            src: ["./src/assets/fonts/atkinson-regular.woff"],
-            weight: 400,
+            src: ["./src/assets/fonts/sora-latin-wght-normal.woff2"],
+            weight: "100 800",
             style: "normal",
             display: "swap",
           },
+        ],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: "Karla",
+      cssVariable: "--font-karla",
+      fallbacks: ["sans-serif"],
+      options: {
+        variants: [
           {
-            src: ["./src/assets/fonts/atkinson-bold.woff"],
-            weight: 700,
+            src: ["./src/assets/fonts/karla-latin-wght-normal.woff2"],
+            weight: "200 800",
             style: "normal",
             display: "swap",
           },

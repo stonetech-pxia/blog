@@ -32,7 +32,16 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-atkinson" preload />
+<Font cssVariable="--font-sora" preload />
+<Font cssVariable="--font-karla" preload />
+
+<!-- Thème clair / sombre choisi par le visiteur (avant le rendu, pour éviter un flash) -->
+<script is:inline>
+	try {
+		const theme = localStorage.getItem("theme");
+		if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+	} catch {}
+</script>
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
