@@ -8,6 +8,8 @@
   </div>
 
   <h2><span class="step-num">1</span>Qui s'occupe de votre site ?</h2>
+  <p class="hint">Facture OVHcloud ? « Hébergement Web », « Starter », « Perso », « Pro » ou « Performance » → choisissez « Je paie un hébergeur ».
+    « VPS » ou « Serveur dédié » → « J'ai mon propre serveur ».</p>
   <div class="choices" id="branch-choices">
     <button type="button" class="choice" data-branch="agence" aria-pressed="false">
       Une agence, un freelance ou un prestataire qui répond encore
@@ -30,8 +32,6 @@
       Je ne sais pas
     </button>
   </div>
-  <p class="hint">Facture OVHcloud ? « Hébergement Web », « Perso », « Pro » ou « Performance » → choisissez « Je paie un hébergeur ».
-    « VPS » ou « Serveur dédié » → « J'ai mon propre serveur ».</p>
 
   <!-- Agence -->
   <section class="branch" data-for="agence" hidden>
@@ -60,8 +60,17 @@ Merci d'avance,
       <li><strong>Avec WordPress :</strong> dans le tableau de bord, <em>Extensions → Ajouter une extension</em>, cherchez « UpdraftPlus », cliquez sur <em>Installer</em> puis <em>Activer</em>.
         Allez ensuite dans <em>Réglages → UpdraftPlus Backups</em> et cliquez sur <em>Sauvegarder maintenant</em>.</li>
       <li><strong>Sinon :</strong> dans votre espace client, cherchez « Sauvegarde » ou « Backup ».</li>
+      <li><strong>Pas de menu <em>Extensions</em> dans WordPress ?</strong> Votre compte n'est pas administrateur. Demandez la sauvegarde à votre hébergeur avec le message plus bas.</li>
       <li><strong>Vous n'y arrivez pas ?</strong> Demandez-la à votre hébergeur avec le message plus bas, il la fera pour vous.</li>
     </ul>
+    <div class="box">
+      <strong>Vous n'avez plus vos accès ?</strong> C'est fréquent quand c'est quelqu'un d'autre qui a créé le site.
+      <ul>
+        <li>Espace client de l'hébergeur : cliquez sur « Mot de passe oublié » avec l'adresse e-mail qui reçoit les factures.</li>
+        <li>Le compte est au nom de l'ancien prestataire ? Contactez le support de l'hébergeur avec une facture que vous avez payée : il vous dira comment récupérer l'accès.</li>
+        <li>Votre facture ne mentionne qu'un nom de domaine (.fr, .com) ou des adresses e-mail ? Votre site est peut-être hébergé ailleurs, par exemple chez l'ancien prestataire : revenez à la question 1 et choisissez « Je ne sais pas ».</li>
+      </ul>
+    </div>
 
     <h2><span class="step-num">3</span>Trouvez votre version de PHP</h2>
     <p>PHP est le « moteur » qui fait fonctionner votre site. Il faut connaître son numéro <strong>complet</strong>, avec trois nombres (ex. 8.3.36).</p>
@@ -79,9 +88,38 @@ Merci d'avance,
       Exemple : 8.3.36 ou 8.3.40 = protégé. Rien d'autre à faire.</div>
     <div class="box warn"><strong>Même série, troisième nombre plus petit</strong> (ex. 8.3.20) : votre hébergeur doit installer le correctif. La plupart le font d'eux-mêmes en quelques jours.
       Envoyez-lui le message ci-dessous pour en avoir le cœur net. Le numéro contient des lettres en plus (ex. « 8.3.6-0ubuntu ») ? Le correctif est peut-être déjà là : l'hébergeur vous le confirmera.</div>
-    <div class="box danger"><strong>Série 8.1, 8.0, 7.x ou plus ancienne :</strong> votre site utilise une version abandonnée. Il faut passer à une version récente (8.3 ou 8.4),
-      mais <strong>changer de version peut casser le site</strong> si ses extensions sont trop anciennes. Ne le faites qu'après la sauvegarde, en vous faisant guider pas à pas
-      (prompt plus bas) ou en le demandant à votre hébergeur.</div>
+    <div class="box danger"><strong>Série 8.1, 8.0, 7.x ou plus ancienne :</strong> votre site utilise une version abandonnée, qui ne recevra pas de correctif.
+      La solution est de passer à une version récente (8.3 ou 8.4). Sur un hébergement web, cela se fait en quelques clics dans l'espace client
+      (« Version PHP », « Sélecteur PHP » ou « Configuration PHP »).
+      <ul>
+        <li><strong>Changer de version peut casser le site</strong> si ses extensions sont trop anciennes. Faites d'abord la sauvegarde, puis, si possible,
+          mettez à jour WordPress et ses extensions (<em>Tableau de bord → Mises à jour</em>).</li>
+        <li>Si le site ne s'affiche plus après le changement, remettez l'ancienne version dans l'espace client : le retour en arrière est en général immédiat.</li>
+        <li>Vous pouvez vous faire guider pas à pas avec le <a href="#generateur">générateur de prompt</a>, ou confier le travail à un professionnel avec le message ci-dessous.</li>
+      </ul>
+    </div>
+    <details>
+      <summary>Message pour confier le changement de version à un professionnel</summary>
+      <div>
+        <p>Pour trouver quelqu'un : l'annuaire de <a href="https://www.cybermalveillance.gouv.fr/">cybermalveillance.gouv.fr</a>, une agence web locale, ou un indépendant « WordPress ».</p>
+        <div class="code-block"><pre id="mail-prestataire-mutualise">Bonjour,
+
+Je cherche quelqu'un pour une intervention urgente sur mon site [WordPress / autre] : [adresse du site], hébergé chez [nom de l'hébergeur] sur l'offre [nom de l'offre].
+La personne qui l'a créé n'est plus joignable.
+
+Suite aux failles PHP « PHP2Shell » (CVE-2026-109618 et CVE-2026-109619, 21 octobre 2026), mon site utilise PHP [version lue dans Santé du site], qui ne recevra pas de correctif.
+
+Pouvez-vous me proposer, avec un devis et un délai :
+1. une sauvegarde complète du site ;
+2. la vérification de la compatibilité du site et de ses extensions, puis le passage à PHP 8.3 ou 8.4 ;
+3. une vérification que le site n'a pas été piraté depuis le 17 octobre.
+
+Je vous transmettrai les accès par téléphone, pas par e-mail.
+
+Merci,
+[Votre nom] – [téléphone]</pre></div>
+      </div>
+    </details>
 
     <h3>Message à envoyer à votre hébergeur</h3>
     <p>Envoyez-le depuis la rubrique « Support », « Assistance » ou « Créer un ticket » de votre espace client.</p>
@@ -184,6 +222,9 @@ Merci,
       <li>Cherchez dans vos e-mails « hébergement », « nom de domaine » ou « renouvellement ».</li>
       <li>Demandez à la personne qui a créé le site.</li>
     </ul>
+    <p><strong>Vous savez que c'est OVHcloud, mais pas quelle offre ?</strong> Connectez-vous à votre espace client.
+      Si votre site apparaît dans <em>Web Cloud → Hébergements</em>, choisissez « Je paie un hébergeur ».
+      S'il apparaît dans <em>Bare Metal Cloud</em> (« Serveurs privés virtuels » ou « Serveurs dédiés »), choisissez « J'ai mon propre serveur ».</p>
     <p>Une fois trouvé, revenez à la question 1. En attendant, le <a href="#generateur">générateur de prompt</a> peut aussi vous aider à chercher.</p>
   </section>
 
@@ -285,6 +326,8 @@ Merci,
   <ul>
     <li><strong>Vérifiez</strong> que la version de PHP est bien corrigée (WordPress : <em>Outils → Santé du site</em>), et que votre site s'affiche normalement, formulaires et boutique compris.</li>
     <li><strong>Si votre site était vulnérable</strong> après le 17 octobre, demandez à votre hébergeur ou prestataire s'il a détecté une activité suspecte.</li>
+    <li><strong>Boutique en ligne ou fichier clients :</strong> si des données personnelles ont pu être volées, vous devez en principe le signaler à la CNIL
+      dans les 72 heures (<a href="https://www.cnil.fr/">cnil.fr</a>). Votre hébergeur ou un professionnel peut vous aider à savoir si c'est le cas.</li>
     <li><strong>Signes d'alerte</strong> : pages bizarres ou publicités inconnues, redirection vers un autre site, comptes administrateurs que vous ne connaissez pas, alerte de Google ou de votre hébergeur.
       Dans ce cas, contactez votre hébergeur et faites appel à un professionnel ; vous pouvez aussi trouver de l'aide sur <a href="https://www.cybermalveillance.gouv.fr/">cybermalveillance.gouv.fr</a>.</li>
   </ul>

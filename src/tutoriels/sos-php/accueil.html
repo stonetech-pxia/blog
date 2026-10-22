@@ -3,6 +3,10 @@
     surnommées <strong>PHP2Shell</strong>. Une tentative d'attaque a été observée dès le 17 octobre, avant l'annonce publique.
   </div>
 
+  <p><strong>Votre site est fait avec WordPress, WooCommerce, PrestaShop, Joomla ou Drupal ?</strong> Alors il utilise PHP, et vous êtes concerné.
+    Sur un hébergement web classique (OVHcloud, o2switch, Hostinger…), c'est en général l'hébergeur qui installe le correctif :
+    votre rôle est de vérifier que c'est fait.</p>
+
   <h2>Par où commencer ?</h2>
   <div class="cards">
     <a class="card" href="/tutoriels/sos-php/developpeurs/">
@@ -20,10 +24,11 @@
     <table>
       <tr><th>Failles</th><td>CVE-2026-109618 et CVE-2026-109619 (« PHP2Shell »)</td></tr>
       <tr><th>Gravité</th><td>Critique – 9,2 / 10 (CVSS v4.0)</td></tr>
-      <tr><th>Conséquence</th><td>Exécution de code à distance sans authentification, quelle que soit l'application</td></tr>
+      <tr><th>Conséquence</th><td>Un pirate peut prendre le contrôle du serveur sans mot de passe, quelle que soit l'application (exécution de code à distance)</td></tr>
       <tr><th>Versions vulnérables</th><td>Toutes les versions antérieures aux versions corrigées ci-dessous, y compris les anciennes (5.x, 7.x, 8.0, 8.1)</td></tr>
       <tr><th>Versions corrigées</th><td><strong>8.2.35 · 8.3.36 · 8.4.27 · 8.5.12</strong> (ou plus récentes)</td></tr>
-      <tr><th>PHP 8.1 et plus ancien</th><td>Plus maintenu : seuls des correctifs « source » existent pour 7.4, 8.0 et 8.1. Il faut migrer vers 8.2 minimum ou passer par un fournisseur de support étendu.</td></tr>
+      <tr><th>PHP 8.1 et plus ancien</th><td>Plus maintenu par PHP. Si votre distribution Linux le fournit encore (Ubuntu 22.04, RHEL 8 et 9…), elle publie son propre correctif.
+        Sinon : correctif « source » pour 7.4, 8.0 et 8.1, support étendu payant, ou passage à 8.2 minimum.</td></tr>
       <tr><th>Solution</th><td>La mise à jour est la <strong>seule protection complète</strong>. Les réglages de contournement ne protègent que partiellement.</td></tr>
     </table>
   </div>

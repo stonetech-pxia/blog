@@ -87,8 +87,8 @@ systemctl list-units --type=service --all '*php*fpm*'                           
     Pour confirmer en HTTP, voir <a href="#verification">Vérification</a>.</p>
 
   <h3>7. La mesure provisoire est-elle active côté FPM ?</h3>
-  <pre><code>/usr/sbin/php-fpm8.2 -i | grep -i 'upload_progress.enabled'      # RHEL : /usr/sbin/php-fpm -i ; cPanel : /opt/cpanel/ea-php82/root/usr/sbin/php-fpm -i
-grep -r upload_progress /etc/php/*/fpm/pool.d/ /etc/php-fpm.d/ 2&gt;/dev/null</code></pre>
+  <pre><code>/usr/sbin/php-fpm8.2 -i | grep -i 'upload_progress.enabled'      # RHEL : /usr/sbin/php-fpm -i ; Remi : /opt/remi/php82/root/usr/sbin/php-fpm -i ; cPanel : /opt/cpanel/ea-php82/root/usr/sbin/php-fpm -i
+grep -r upload_progress /etc/php/*/fpm/pool.d/ /etc/php-fpm.d/ /etc/opt/remi/php*/php-fpm.d/ /opt/cpanel/ea-php*/root/etc/php-fpm.d/ 2&gt;/dev/null</code></pre>
   <p>Lit le <code>php.ini</code> de FPM (pas celui du CLI), puis les réglages des pools. Avec mod_php, seule la <a href="#verification">vérification en HTTP</a> fait foi.</p>
 
   <h3>8. Des processus tournent-ils encore sur l'ancien code ?</h3>
@@ -107,19 +107,20 @@ sudo dnf needs-restarting -s     # RHEL et dérivés</code></pre>
 ansible all -m shell -a 'php -v | head -1'</code></pre>
 
   <h2 id="lecture">Lire le résultat</h2>
-  <p>Appliquez le tableau à <strong>chaque installation</strong> trouvée à l'étape 2 (CLI, FPM, mod_php, conteneurs), et retenez la première ligne qui correspond.</p>
+  <p>Appliquez le tableau à <strong>chaque installation</strong> trouvée à l'étape 2 (CLI, FPM, mod_php, conteneurs), et retenez la première ligne qui correspond. La première ligne passe avant les autres : un processus qui tourne sur l'ancien code expose le serveur, quelle que soit la version installée.</p>
   <div class="table-scroll">
     <table>
       <tr><th>Ce que vous voyez</th><th>Verdict</th><th>Que faire</th></tr>
+      <tr><td>Un processus PHP ou Apache listé à l'étape 8</td><td><strong>Toujours exposé</strong></td><td>Redémarrer le service.</td></tr>
       <tr><td>Version (dans <code>dpkg -l</code> / <code>rpm -qa</code>) égale ou supérieure à 8.2.<strong>35</strong>, 8.3.<strong>36</strong>, 8.4.<strong>27</strong> ou 8.5.<strong>12</strong>, avec ou sans suffixe</td><td><strong>Corrigé</strong></td><td>Vérifier que les workers ont redémarré (étape 8).</td></tr>
       <tr><td>Version inférieure, mais CVE trouvée à l'étape 5</td><td><strong>Corrigé</strong> (rétroporté)</td><td>Redémarrer si besoin.</td></tr>
       <tr><td>8.2 à 8.5 inférieure, sans CVE à l'étape 5</td><td><strong>Vulnérable</strong></td><td>Mettre à jour (sections ci-dessous).</td></tr>
       <tr><td>8.1 ou plus ancien, sans CVE, fourni par une distribution encore maintenue (Ubuntu 22.04, RHEL / Alma / Rocky 8 et 9…)</td><td><strong>Vulnérable</strong>, correctif possible</td><td>Mettre à jour les paquets de la distribution, puis refaire l'étape 5.</td></tr>
       <tr><td>8.1 ou plus ancien, venant de php.net, Sury, d'une compilation ou d'une distribution en fin de vie (Debian 10, Ubuntu 20.04, CentOS 7…)</td><td><strong>Non maintenu</strong></td><td>Correctif source, fournisseur de support étendu, ou migration (<a href="#ancien">voir plus bas</a>).</td></tr>
-      <tr><td>Un processus PHP ou Apache listé à l'étape 8</td><td><strong>Toujours exposé</strong></td><td>Redémarrer le service.</td></tr>
-      <tr><td><code>upload_progress.enabled</code> à <code>On</code> (ou <code>1</code>)</td><td>Pas de mesure provisoire</td><td>Normal une fois corrigé ; sinon, voir <a href="#provisoire">mesures provisoires</a>.</td></tr>
     </table>
   </div>
+  <p>À part, l'étape 7 : <code>upload_progress.enabled</code> à <code>On</code> (ou <code>1</code>) veut dire que la mesure provisoire n'est pas active.
+    C'est normal une fois PHP corrigé ; sinon, voir les <a href="#provisoire">mesures provisoires</a>.</p>
 
   <h2 id="pieges">Les pièges</h2>
   <details open>
@@ -169,12 +170,16 @@ apt list --upgradable 2>/dev/null | grep -i php</code></pre>
     Vérifiez d'abord quel dépôt sera utilisé (ligne <code>Candidate</code>) :
     <pre><code>apt-cache policy libapache2-mod-php8.1 php8.1-common | grep -E '^\S|Installed|Candidate'</code></pre>
   </div>
-  <pre><code># 1. Mise à jour de tous les paquets PHP installés (cli, fpm, mod_php, extensions…)
-sudo apt install --only-upgrade $(dpkg -l | awk '/^ii +(php|libapache2-mod-php)/ {print $2}')</code></pre>
+  <pre><code># 1. Mise à jour des paquets PHP versionnés installés (cli, fpm, mod_php, extensions…)
+#    Le motif écarte phpmyadmin et les bibliothèques php-*, qui ne sont pas concernées
+sudo apt install --only-upgrade $(dpkg -l | awk '/^ii +(php[0-9.]+-|libapache2-mod-php)/ {print $2}')</code></pre>
+  <p><strong>Ubuntu 22.04 et plus :</strong> après <code>apt</code>, <code>needrestart</code> affiche une liste de services à redémarrer, déjà cochés.
+    Valider redémarre tout ce qui est coché. Décochez PHP-FPM si vous préférez le recharger version par version (étape 3).</p>
   <pre><code># 2. Le correctif est-il dans les paquets ?
 zgrep -E 'CVE-2026-10961[89]' /usr/share/doc/php*-common/changelog.Debian.gz</code></pre>
-  <pre><code># 3. Redémarrage de toutes les versions de PHP-FPM
-sudo systemctl restart '*php*-fpm.service'</code></pre>
+  <pre><code># 3. Rechargement de PHP-FPM, une version à la fois (évite de couper tous les sites en même temps)
+#    À répéter pour chaque version installée (8.2, 8.3…)
+sudo php-fpm8.2 -t &amp;&amp; sudo systemctl reload php8.2-fpm</code></pre>
   <pre><code># 4. Seulement si mod_php (étape 6 du diagnostic)
 sudo systemctl restart apache2</code></pre>
   <p>Puis l'<a href="#diagnostic">étape 8</a> du diagnostic pour vérifier qu'aucun processus ne tourne sur l'ancien code.</p>
@@ -191,8 +196,10 @@ sudo dnf upgrade --refresh 'php*'
 # Le correctif est-il dans les paquets ?
 rpm -qa '*php*-common' | xargs -r rpm -q --changelog | grep -E 'CVE-2026-10961[89]'
 
-sudo systemctl restart php-fpm
-sudo systemctl restart httpd   # si mod_php
+# Rechargement de PHP-FPM, une version à la fois
+sudo php-fpm -t &amp;&amp; sudo systemctl reload php-fpm
+sudo systemctl reload php82-php-fpm   # Remi : un service par version (php82-php-fpm, php83-php-fpm…)
+sudo systemctl restart httpd          # si mod_php
 
 # Reste-t-il des processus sur l'ancien code ?
 sudo dnf needs-restarting -s</code></pre>
@@ -229,11 +236,16 @@ docker compose exec app php-fpm -i | grep upload_progress.enabled</code></pre>
     <li><strong>CI :</strong> reconstruisez avec <code>--pull</code> et sans cache, sinon l'ancienne couche PHP est réutilisée. Faites le tour des registres internes.</li>
   </ul>
   <h3>Kubernetes</h3>
-  <pre><code># Quelles images tournent ?
-kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | sort -u | grep -i php
+  <pre><code># Quelle version de PHP tourne dans chaque pod ? (le nom de l'image ne contient pas toujours « php » ;
+# kubectl exec interroge le premier conteneur du pod)
+kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{"\n"}{end}' \
+  | while read ns p; do echo "$ns/$p : $(kubectl exec -n "$ns" "$p" -- php -v 2&gt;/dev/null | head -1)"; done
 
-# Après avoir publié l'image corrigée (idéalement référencée par digest) :
-kubectl rollout restart deployment/&lt;nom&gt; -n &lt;namespace&gt;</code></pre>
+# Déployez l'image corrigée en la référençant par digest : avec un tag réutilisé,
+# les nœuds peuvent relancer l'ancienne image depuis leur cache
+kubectl set image deployment/&lt;nom&gt; &lt;conteneur&gt;=&lt;registre&gt;/&lt;image&gt;@sha256:&lt;digest&gt; -n &lt;namespace&gt;
+kubectl rollout status deployment/&lt;nom&gt; -n &lt;namespace&gt;</code></pre>
+  <p>Même chose pour les StatefulSets, DaemonSets et CronJobs (<code>kubectl set image statefulset/&lt;nom&gt; …</code>).</p>
 
   <h2 id="panneaux">cPanel / WHM, Plesk, DirectAdmin</h2>
   <h3>cPanel / WHM (EasyApache 4)</h3>
@@ -294,8 +306,20 @@ php_admin_value[memory_limit] = -1
 pm.max_requests = 1</code></pre>
   <p>Avec mod_php : mêmes directives sous la forme <code>php_admin_flag session.upload_progress.enabled off</code> dans la configuration Apache (pas dans <code>.htaccess</code>).</p>
   <p><strong>Compensez <code>memory_limit = -1</code></strong> par une limite au niveau du système, sinon une seule requête peut épuiser la mémoire
-    et faire tuer d'autres services (base de données comprise). N'utilisez <strong>pas</strong> <code>RLIMIT_AS</code> / <code>RLIMIT_DATA</code> :</p>
-  <pre><code>sudo systemctl set-property php8.2-fpm.service MemoryMax=2G   # adaptez la valeur et le nom du service</code></pre>
+    et faire tuer d'autres services (base de données comprise). N'utilisez <strong>pas</strong> <code>RLIMIT_AS</code> / <code>RLIMIT_DATA</code>.
+    Posez plutôt une limite systemd, <strong>avec <code>OOMPolicy=continue</code></strong> : sans cette ligne, systemd arrête tout le service dès qu'un worker
+    est tué, et tous les sites de cette version tombent.</p>
+  <pre><code>sudo systemctl edit php8.2-fpm.service   # adaptez le nom du service</code></pre>
+  <p>Dans l'éditeur qui s'ouvre, ajoutez ces lignes, puis enregistrez :</p>
+  <pre><code>[Service]
+MemoryMax=2G
+MemorySwapMax=0
+OOMPolicy=continue</code></pre>
+  <p><code>MemorySwapMax=0</code> : sans elle, sur un serveur avec swap, la requête part en swap au lieu d'être coupée.</p>
+  <pre><code>sudo systemctl restart php8.2-fpm
+systemctl show php8.2-fpm -p MemoryMax -p MemorySwapMax -p OOMPolicy   # contrôle</code></pre>
+  <p><code>OOMPolicy</code> demande systemd 243 ou plus récent (<code>systemctl --version</code>). Retirez ces lignes avec la même commande
+    <code>systemctl edit</code> une fois PHP corrigé. En conteneur, c'est la limite mémoire du conteneur qui joue ce rôle : un dépassement fait redémarrer tout le conteneur.</p>
   <p>Autres mesures citées par les avis :</p>
   <ul>
     <li>Garder <code>post_max_size</code> bas et limiter la taille des requêtes au niveau du frontal (nginx, proxy, WAF).</li>
@@ -321,7 +345,7 @@ echo "Ouvrez : https://votre-site/$f"</code></pre>
     Le fichier de test est placé dans <code>/dev/shm</code>, visible par FPM même avec <code>PrivateTmp</code> (RHEL). Un <code>open_basedir</code> peut toutefois le bloquer.</p>
   <pre><code>sudo apt install libfcgi-bin   # fournit cgi-fcgi (RHEL : dnf install fcgi, dépôt EPEL)
 echo '&lt;?php echo PHP_VERSION, " upload_progress=", ini_get("session.upload_progress.enabled") ? "On" : "Off", "\n";' | sudo tee /dev/shm/v.php &gt;/dev/null
-for s in /run/php/*.sock /run/php-fpm/*.sock /opt/cpanel/ea-php*/root/usr/var/run/php-fpm/*.sock; do [ -S "$s" ] &amp;&amp; [ ! -L "$s" ] &amp;&amp; echo "$s : $(sudo SCRIPT_FILENAME=/dev/shm/v.php REQUEST_METHOD=GET cgi-fcgi -bind -connect "$s" | tail -1)"; done
+for s in /run/php/*.sock /run/php-fpm/*.sock /var/opt/remi/php*/run/php-fpm/*.sock /opt/cpanel/ea-php*/root/usr/var/run/php-fpm/*.sock; do [ -S "$s" ] &amp;&amp; [ ! -L "$s" ] &amp;&amp; echo "$s : $(sudo SCRIPT_FILENAME=/dev/shm/v.php REQUEST_METHOD=GET cgi-fcgi -bind -connect "$s" | tail -1)"; done
 sudo rm /dev/shm/v.php</code></pre>
   <p>Enfin, l'<a href="#diagnostic">étape 8</a> du diagnostic confirme qu'aucun processus ne tourne encore sur l'ancien code.</p>
 
@@ -343,7 +367,7 @@ sudo find /tmp /var/tmp /dev/shm -type f -newerct '2026-10-15' 2&gt;/dev/null
 # (sudo sh -c : les jokers doivent être développés par root, /var/log/httpd n'est pas lisible sinon)
 sudo sh -c "zgrep -h 'Allowed memory size' /var/log/php*-fpm.log* /var/log/php-fpm/* /var/log/apache2/error.log* \
   /var/log/httpd/error_log* /var/log/nginx/error.log* /etc/apache2/logs/error_log* \
-  /opt/cpanel/ea-php*/root/usr/var/log/php-fpm/* 2&gt;/dev/null" | tail -50
+  /var/opt/remi/php*/log/php-fpm/* /opt/cpanel/ea-php*/root/usr/var/log/php-fpm/* 2&gt;/dev/null" | tail -50
 # (avec nginx + FPM, ces erreurs apparaissent aussi sous la forme « FastCGI sent in stderr » ;
 #  sur cPanel, chaque site peut aussi avoir son propre fichier error_log)
 

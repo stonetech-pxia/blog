@@ -87,7 +87,7 @@ const NIVEAUX = {
 
 const BRANCH_INSTRUCTIONS = {
   agence: "Aide-moi surtout à comprendre ce que je dois demander à mon prestataire, à rédiger un message clair, et à vérifier moi-même ensuite que le travail a été fait (sans accès technique).",
-  mutualise: "Guide-moi en priorité via le tableau de bord de mon site (pour WordPress : Outils → Santé du site pour connaître la version de PHP) et via l'espace client de mon hébergeur (sélecteur de version PHP, sauvegardes). Si une action ne peut être faite que par l'hébergeur, dis-le et rédige le message à lui envoyer.",
+  mutualise: "Guide-moi en priorité via le tableau de bord de mon site (pour WordPress : Outils → Santé du site pour connaître la version de PHP) et via l'espace client de mon hébergeur (sélecteur de version PHP, sauvegardes). Si une action ne peut être faite que par l'hébergeur, dis-le et rédige le message à lui envoyer. Si ma version de PHP est en 7.x, 8.0 ou 8.1, la solution est de passer à 8.3 ou 8.4 avec le sélecteur de version PHP de mon espace client : guide-moi pour le faire, après avoir vérifié avec moi la compatibilité de mon site.",
   plateforme: "Confirme-moi si j'ai quelque chose à faire ou non, et explique-moi pourquoi.",
   serveur: "Je voudrais d'abord savoir, en SSH, si une mise à jour simple est possible. Explique-moi comment me connecter depuis mon ordinateur. Ensuite, fais un diagnostic : mon système, toutes les versions de PHP installées (y compris PHP-FPM), comment elles ont été installées, quel serveur web et quelle version de PHP servent réellement le site, et si des conteneurs Docker sont utilisés. Si une mise à jour simple est possible, guide-moi une commande à la fois, sans oublier le redémarrage de PHP-FPM / Apache et la vérification de la version réellement utilisée par le site. Sinon, ne me fais rien modifier et rédige le message à envoyer à un prestataire.",
   inconnu: "Commence par m'aider à identifier qui héberge et qui gère mon site (factures, e-mails, outils en ligne), puis adapte la suite.",
@@ -119,25 +119,42 @@ function buildPrompt(d) {
   );
   if (d.version) lines.push(`- Ma version de PHP (relevée par moi) : ${d.version}`);
   if (d.precisions) lines.push(`- Précisions : ${d.precisions}`);
+  // Les consignes liées au terminal ne concernent que la personne qui gère son propre serveur.
+  const terminal = d.gestion === "serveur";
+  const regles = [
+    "Parle-moi avec des mots simples. Explique chaque terme technique la première fois (une comparaison de la vie courante m'aide).",
+    "Commence par me dire en 3 phrases maximum : suis-je concerné, est-ce urgent, et ce que nous allons faire.",
+    "Si une information te manque pour être sûr de toi, pose-moi tes questions AVANT de commencer.",
+    "Étape 0 obligatoire : m'aider à faire une sauvegarde complète (fichiers et base de données) et à vérifier qu'elle existe bien. Si j'ai déjà fait un snapshot chez mon hébergeur, vérifie seulement qu'il est terminé.",
+  ];
+  if (terminal) {
+    regles.push(
+      "Une seule étape à la fois, et une seule commande par message, y compris pendant le diagnostic. Pour chaque étape, indique : le but, où cliquer ou la commande exacte à copier, ce que je dois voir si tout va bien (en précisant que l'affichage peut varier un peu), et quoi faire sinon. Puis attends que je te réponde avant de passer à la suivante.",
+      "Pour découvrir mon environnement, utilise uniquement des commandes standard, courtes (une seule ligne) et qui ne font que lire (par exemple : cat /etc/os-release, php -v). Explique chacune avant que je la tape. Jamais de script à créer ou à télécharger, jamais de curl ou wget, jamais de longue suite de commandes enchaînées, jamais de commande qui affiche un fichier contenant des mots de passe (wp-config.php, .env…).",
+      "Ne me propose jamais de commande qui supprime des fichiers ou des données, qui change les droits d'accès (ex. chmod 777) ou qui désinstalle des logiciels, sans m'expliquer clairement le risque et me demander mon accord.",
+      "Ne me demande jamais de mot de passe, et rappelle-moi de ne jamais t'en envoyer, ni l'e-mail qui le contient. Distingue toujours ce que je tape dans le terminal (j'y tape la vraie adresse IP et mon mot de passe, qui ne s'affiche pas : c'est normal) de ce que je te colle ici (j'y remplace l'adresse IP par MON-IP et le nom de mon site par MONSITE). Dis-moi exactement quoi remplacer, sans crochets ni chevrons.",
+      "Si mon système est en fin de support (Debian 10 ou plus ancien, Ubuntu 20.04 ou plus ancien, CentOS 7…) ou si PHP est en 7.x, ne me guide pas pour une mise à niveau : explique-moi calmement la situation, dis-moi qu'il faudra aussi vérifier que le serveur n'a pas été piraté, et rédige le message pour un prestataire. Ne me propose jamais d'ajouter un dépôt de logiciels, de modifier /etc/apt/sources.list, ni de lancer apt full-upgrade, dist-upgrade ou do-release-upgrade."
+    );
+  } else {
+    regles.push(
+      "Une seule étape à la fois. Pour chaque étape, indique : le but, où cliquer exactement, ce que je dois voir si tout va bien (en précisant que l'affichage peut varier un peu), et quoi faire sinon. Puis attends que je te réponde avant de passer à la suivante.",
+      "Ne me fais pas utiliser de terminal ni de ligne de commande : passe uniquement par le tableau de bord de mon site et l'espace client de mon hébergeur. Si une action n'est possible qu'en ligne de commande, dis-le et rédige le message à envoyer à mon hébergeur ou à un prestataire.",
+      "Ne me demande jamais de mot de passe, et rappelle-moi de ne jamais t'en envoyer, ni l'e-mail qui le contient."
+    );
+  }
+  regles.push(
+    "Avant tout changement de version de PHP, vérifie avec moi que mon site (et ses extensions ou modules) est compatible, et explique comment revenir en arrière si le site ne fonctionne plus.",
+    "Si la mise à jour n'est pas possible tout de suite, propose-moi les mesures provisoires les plus simples, y compris mettre le site hors ligne, et laisse-moi décider.",
+    "Si une étape est trop risquée pour un non-technicien, dis-le franchement, et rédige-moi un message à envoyer à mon hébergeur ou à un prestataire.",
+    "Termine par une vérification : comment confirmer que mon site utilise bien une version corrigée et qu'il fonctionne normalement."
+  );
   lines.push(
     "",
     "## Ce que j'attends de toi",
     BRANCH_INSTRUCTIONS[d.gestion],
     "",
     "Respecte strictement ces règles :",
-    "1. Parle-moi avec des mots simples. Explique chaque terme technique la première fois (une comparaison de la vie courante m'aide).",
-    "2. Commence par me dire en 3 phrases maximum : suis-je concerné, est-ce urgent, et ce que nous allons faire.",
-    "3. Si une information te manque pour être sûr de toi, pose-moi tes questions AVANT de commencer.",
-    "4. Étape 0 obligatoire : m'aider à faire une sauvegarde complète (fichiers et base de données) et à vérifier qu'elle existe bien. Si j'ai déjà fait un snapshot chez mon hébergeur, vérifie seulement qu'il est terminé.",
-    "5. Une seule étape à la fois, et une seule commande par message, y compris pendant le diagnostic. Pour chaque étape, indique : le but, où cliquer ou la commande exacte à copier, ce que je dois voir si tout va bien (en précisant que l'affichage peut varier un peu), et quoi faire sinon. Puis attends que je te réponde avant de passer à la suivante.",
-    "6. Pour découvrir mon environnement, utilise uniquement des commandes standard, courtes (une seule ligne) et qui ne font que lire (par exemple : cat /etc/os-release, php -v). Explique chacune avant que je la tape. Jamais de script à créer ou à télécharger, jamais de curl ou wget, jamais de longue suite de commandes enchaînées, jamais de commande qui affiche un fichier contenant des mots de passe (wp-config.php, .env…).",
-    "7. Ne me propose jamais de commande qui supprime des fichiers ou des données, qui change les droits d'accès (ex. chmod 777) ou qui désinstalle des logiciels, sans m'expliquer clairement le risque et me demander mon accord.",
-    "8. Ne me demande jamais de mot de passe, et rappelle-moi de ne jamais t'en envoyer, ni l'e-mail qui le contient. Distingue toujours ce que je tape dans le terminal (j'y tape la vraie adresse IP et mon mot de passe, qui ne s'affiche pas : c'est normal) de ce que je te colle ici (j'y remplace l'adresse IP par MON-IP et le nom de mon site par MONSITE). Dis-moi exactement quoi remplacer, sans crochets ni chevrons.",
-    "9. Si mon système est en fin de support (Debian 10 ou plus ancien, Ubuntu 20.04 ou plus ancien, CentOS 7…) ou si PHP est en 7.x, ne me guide pas pour une mise à niveau : explique la situation, dis-moi que le serveur a pu être piraté, et rédige le message pour un prestataire. Ne me propose jamais d'ajouter un dépôt de logiciels, de modifier /etc/apt/sources.list, ni de lancer apt full-upgrade, dist-upgrade ou do-release-upgrade.",
-    "10. Avant tout changement de version de PHP, vérifie avec moi que mon site (et ses extensions ou modules) est compatible, et explique comment revenir en arrière si le site ne fonctionne plus.",
-    "11. Si la mise à jour n'est pas possible tout de suite, propose-moi les mesures provisoires les plus simples, y compris mettre le site hors ligne, et laisse-moi décider.",
-    "12. Si une étape est trop risquée pour un non-technicien, dis-le franchement, et rédige-moi un message à envoyer à mon hébergeur ou à un prestataire.",
-    "13. Termine par une vérification : comment confirmer que mon site utilise bien une version corrigée et qu'il fonctionne normalement.",
+    ...regles.map((r, i) => `${i + 1}. ${r}`),
     "",
     "Commence maintenant."
   );
