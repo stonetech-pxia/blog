@@ -1,5 +1,5 @@
   <div class="box warn">
-    <strong>Trois règles d'or avant de commencer</strong>
+    <strong>Avant de commencer</strong>
     <ol>
       <li><strong>Faites une sauvegarde</strong> de votre site avant de toucher à quoi que ce soit.</li>
       <li><strong>Ne donnez jamais vos mots de passe</strong> à ChatGPT ou à une autre IA, ni à quelqu'un qui vous contacte « pour vous aider ».</li>
@@ -49,18 +49,18 @@ Pouvez-vous me confirmer par écrit, pour mon site [adresse du site] :
 
 Merci d'avance,
 [Votre nom]</pre></div>
-    <p>Pas de réponse sous 48 h, même après une relance par téléphone ? Ne restez pas bloqué : choisissez « Je paie un hébergeur » ci-dessus (ou « J'ai mon propre serveur » si votre facture mentionne un VPS) et agissez directement.</p>
+    <p>Toujours pas de réponse au bout de 48 h, même après un coup de fil ? Alors choisissez « Je paie un hébergeur » ci-dessus (ou « J'ai mon propre serveur » si votre facture mentionne un VPS) et agissez directement.</p>
   </section>
 
   <!-- Mutualisé -->
   <section class="branch" data-for="mutualise" hidden>
     <h2><span class="step-num">2</span>Faites une sauvegarde</h2>
-    <p>Bonne nouvelle : la plupart des hébergeurs font déjà une sauvegarde automatique chaque jour. Pour en faire une vous-même, juste avant d'agir :</p>
+    <p>La plupart des hébergeurs font déjà une sauvegarde automatique chaque jour. Pour en faire une vous-même juste avant d'agir :</p>
     <ul>
       <li><strong>Avec WordPress :</strong> dans le tableau de bord, <em>Extensions → Ajouter une extension</em>, cherchez « UpdraftPlus », cliquez sur <em>Installer</em> puis <em>Activer</em>.
         Allez ensuite dans <em>Réglages → UpdraftPlus Backups</em> et cliquez sur <em>Sauvegarder maintenant</em>.</li>
       <li><strong>Sinon :</strong> dans votre espace client, cherchez « Sauvegarde » ou « Backup ».</li>
-      <li><strong>Vous n'y arrivez pas ?</strong> Ce n'est pas grave : demandez-le à votre hébergeur avec le message plus bas, il le fera pour vous.</li>
+      <li><strong>Vous n'y arrivez pas ?</strong> Demandez-la à votre hébergeur avec le message plus bas, il la fera pour vous.</li>
     </ul>
 
     <h2><span class="step-num">3</span>Trouvez votre version de PHP</h2>
@@ -101,10 +101,10 @@ Merci,
   <!-- Plateforme -->
   <section class="branch" data-for="plateforme" hidden>
     <div class="box ok">
-      <h3>Bonne nouvelle : vous n'avez rien à faire.</h3>
+      <h3>Vous n'avez rien à faire.</h3>
       <p>Sur Wix, Shopify, Squarespace, Webflow ou WordPress.com, c'est la plateforme qui gère les serveurs et leurs mises à jour. Vous n'avez pas accès à PHP et n'avez rien à installer.</p>
     </div>
-    <p>Restez quand même prudent :</p>
+    <p>Deux précautions quand même :</p>
     <ul>
       <li>Si vous avez <strong>un autre site</strong> (un blog, un ancien site) hébergé ailleurs, refaites ce parcours pour lui.</li>
       <li>Méfiez-vous des e-mails qui vous demandent de « mettre à jour PHP » en cliquant sur un lien : c'est probablement une arnaque.</li>
@@ -155,7 +155,7 @@ Merci,
     </ul>
 
     <h2><span class="step-num">4</span>Faites-vous guider par une IA, commande par commande</h2>
-    <p>Nous ne fournissons <strong>aucun script</strong> : vous ne devriez jamais exécuter sur votre serveur un programme que vous ne comprenez pas, y compris le nôtre.</p>
+    <p>Nous ne fournissons <strong>aucun script</strong>. Ne lancez jamais sur votre serveur un programme que vous ne comprenez pas, d'où qu'il vienne.</p>
     <p>À la place, le <a href="#generateur">générateur de prompt</a> ci-dessous prépare un message qui demande à l'IA de vous faire taper
       <strong>de courtes commandes standard, une à la fois</strong>, qui ne font que lire des informations (par exemple <code>php -v</code>, qui affiche la version de PHP).
       Avant chaque commande, l'IA doit vous expliquer ce qu'elle fait. Vous lui collez le résultat, et elle vous dit quoi faire ensuite.</p>
@@ -189,9 +189,9 @@ Merci,
 
   <h2 id="generateur">Générateur de prompt pour ChatGPT, Claude, Mistral ou Gemini</h2>
   <p>
-    Remplissez ce formulaire. Nous créons un message (un « prompt ») qui donne à l'IA <strong>les informations à jour sur les failles</strong>
-    (qu'elle ne connaît pas forcément) et des <strong>règles de sécurité</strong> pour qu'elle vous guide prudemment, en langage simple.
-    Rien n'est envoyé : tout se passe dans votre navigateur.
+    Remplissez ce formulaire. On prépare un texte (un « prompt ») à coller dans une IA : il lui explique <strong>la faille</strong>,
+    qu'elle ne connaît peut-être pas encore, et lui demande de vous guider <strong>prudemment</strong>, avec des mots simples.
+    Le texte est préparé dans votre navigateur : rien n'est envoyé à ce site.
   </p>
 
   <form class="gen box" id="gen-form">

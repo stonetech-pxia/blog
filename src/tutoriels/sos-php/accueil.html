@@ -7,15 +7,15 @@
   <div class="cards">
     <a class="card" href="/tutoriels/sos-php/developpeurs/">
       <strong>Je suis développeur ou administrateur →</strong>
-      Diagnostic en commandes standard, versions corrigées, mise à jour par environnement, pièges à éviter, mesures provisoires et vérification.
+      Diagnostic, mise à jour selon votre système, pièges à éviter, mesures provisoires et vérification.
     </a>
     <a class="card" href="/tutoriels/sos-php/non-tech/">
       <strong>Je ne suis pas technicien →</strong>
-      Un parcours guidé en quelques questions, des modèles de messages, et un message tout prêt (un « prompt ») à coller dans ChatGPT, Claude, Mistral ou Gemini.
+      On vous dit quoi faire selon votre situation, avec des messages tout prêts pour votre hébergeur et un texte à coller dans ChatGPT, Claude, Mistral ou Gemini si vous voulez être guidé.
     </a>
   </div>
 
-  <h2>L'essentiel en 30 secondes</h2>
+  <h2>En bref</h2>
   <div class="table-scroll">
     <table>
       <tr><th>Failles</th><td>CVE-2026-109618 et CVE-2026-109619 (« PHP2Shell »)</td></tr>
@@ -30,19 +30,19 @@
 
   <h2>Pourquoi c'est grave, expliqué simplement</h2>
   <p>
-    Imaginez que votre site soit une boutique. Ces failles ne permettent pas seulement de casser une vitrine :
-    elles donnent au cambrioleur <strong>les clés de l'arrière-boutique</strong>. Un pirate peut alors voler les données de vos clients,
-    installer un virus, envoyer des spams depuis votre serveur ou effacer votre site.
+    Imaginez que votre site soit une boutique. Avec ces failles, le cambrioleur n'a pas besoin de casser la vitrine :
+    il a directement <strong>les clés de l'arrière-boutique</strong>. Il peut voler les données de vos clients,
+    installer un logiciel malveillant, envoyer des spams depuis votre serveur ou effacer votre site.
   </p>
   <p>
     Il n'a besoin ni de mot de passe ni d'une erreur de votre part : il suffit que votre serveur utilise une version de PHP non corrigée.
-    C'est pour cela que de nombreux sites se sont mis en maintenance le temps de se mettre à jour.
+    Certains sites se sont d'ailleurs mis en maintenance le temps de faire la mise à jour.
   </p>
 
   <div class="box warn">
     <strong>Méfiez-vous des faux outils.</strong> De faux programmes de « test de vulnérabilité » circulent déjà sur GitHub et contiennent du code malveillant.
     N'exécutez jamais un script que vous ne comprenez pas ou dont vous ne connaissez pas l'origine.
-    <strong>Ce guide ne vous demandera jamais de télécharger ou d'exécuter un script</strong> : nos guides n'utilisent que des commandes standard, expliquées une par une, et les outils de votre hébergeur.
+    <strong>Ce guide ne vous fera jamais télécharger d'outil de détection.</strong> Il n'utilise que des commandes standard, expliquées une par une, et les outils de votre hébergeur.
   </div>
 
   <h2>Sources officielles</h2>
