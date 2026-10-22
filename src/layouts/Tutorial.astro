@@ -1,0 +1,110 @@
+---
+import '../styles/tutoriel.css';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	lead: string;
+	tutorial: { title: string; href: string };
+	pages: { label: string; href: string }[];
+}
+
+const { title, description, lead, tutorial, pages } = Astro.props;
+const current = Astro.url.pathname.replace(/\/?$/, '/');
+---
+
+<html lang="fr">
+	<head>
+		<BaseHead title={`${title} – ${tutorial.title}`} description={description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 100%;
+				margin: 0;
+			}
+			.prose {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: auto;
+				padding: 1em;
+				color: rgb(var(--gray-dark));
+			}
+			.title {
+				margin-bottom: 1em;
+				padding: 1em 0 0;
+				text-align: center;
+			}
+			.title h1 {
+				margin: 0 0 0.4em 0;
+				font-size: 2.441em;
+			}
+			.crumb {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+			}
+			.crumb a {
+				color: rgb(var(--gray));
+			}
+			.lead {
+				color: rgb(var(--gray));
+				font-size: 1.1em;
+			}
+			.tuto-nav {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 0.25em 1em;
+				margin: 0 0 2em;
+				padding: 0.5em 0;
+				border-top: 1px solid rgb(var(--gray-light));
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.tuto-nav a {
+				padding: 0.25em 0.5em;
+				color: rgb(var(--black));
+				text-decoration: none;
+				border-bottom: 4px solid transparent;
+			}
+			.tuto-nav a[aria-current='page'] {
+				font-weight: bolder;
+				border-bottom-color: var(--accent);
+			}
+			@media (max-width: 720px) {
+				.title h1 {
+					font-size: 1.953em;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article class="prose">
+				<div class="title">
+					<div class="crumb">
+						<a href="/tutoriels/">Tutoriels</a> › {tutorial.title}
+					</div>
+					<h1>{title}</h1>
+					<p class="lead">{lead}</p>
+				</div>
+				<nav class="tuto-nav" aria-label={tutorial.title}>
+					{
+						pages.map((p) => (
+							<a href={p.href} aria-current={p.href === current ? 'page' : undefined}>
+								{p.label}
+							</a>
+						))
+					}
+				</nav>
+				<div class="tuto">
+					<slot />
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>

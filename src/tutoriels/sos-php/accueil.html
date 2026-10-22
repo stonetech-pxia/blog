@@ -1,0 +1,60 @@
+  <div class="box danger">
+    <strong>Alerte – 21 octobre 2026.</strong> PHP a publié des correctifs d'urgence pour deux failles critiques
+    surnommées <strong>PHP2Shell</strong>. Une tentative d'attaque a été observée dès le 17 octobre, avant l'annonce publique.
+  </div>
+
+  <h2>Par où commencer ?</h2>
+  <div class="cards">
+    <a class="card" href="/tutoriels/sos-php/developpeurs/">
+      <strong>Je suis développeur ou administrateur →</strong>
+      Diagnostic en commandes standard, versions corrigées, mise à jour par environnement, pièges à éviter, mesures provisoires et vérification.
+    </a>
+    <a class="card" href="/tutoriels/sos-php/non-tech/">
+      <strong>Je ne suis pas technicien →</strong>
+      Un parcours guidé en quelques questions, des modèles de messages, et un message tout prêt (un « prompt ») à coller dans ChatGPT, Claude, Mistral ou Gemini.
+    </a>
+  </div>
+
+  <h2>L'essentiel en 30 secondes</h2>
+  <div class="table-scroll">
+    <table>
+      <tr><th>Failles</th><td>CVE-2026-109618 et CVE-2026-109619 (« PHP2Shell »)</td></tr>
+      <tr><th>Gravité</th><td>Critique – 9,2 / 10 (CVSS v4.0)</td></tr>
+      <tr><th>Conséquence</th><td>Exécution de code à distance sans authentification, quelle que soit l'application</td></tr>
+      <tr><th>Versions vulnérables</th><td>Toutes les versions antérieures aux versions corrigées ci-dessous, y compris les anciennes (5.x, 7.x, 8.0, 8.1)</td></tr>
+      <tr><th>Versions corrigées</th><td><strong>8.2.35 · 8.3.36 · 8.4.27 · 8.5.12</strong> (ou plus récentes)</td></tr>
+      <tr><th>PHP 8.1 et plus ancien</th><td>Plus maintenu : seuls des correctifs « source » existent pour 7.4, 8.0 et 8.1. Il faut migrer vers 8.2 minimum ou passer par un fournisseur de support étendu.</td></tr>
+      <tr><th>Solution</th><td>La mise à jour est la <strong>seule protection complète</strong>. Les réglages de contournement ne protègent que partiellement.</td></tr>
+    </table>
+  </div>
+
+  <h2>Pourquoi c'est grave, expliqué simplement</h2>
+  <p>
+    Imaginez que votre site soit une boutique. Ces failles ne permettent pas seulement de casser une vitrine :
+    elles donnent au cambrioleur <strong>les clés de l'arrière-boutique</strong>. Un pirate peut alors voler les données de vos clients,
+    installer un virus, envoyer des spams depuis votre serveur ou effacer votre site.
+  </p>
+  <p>
+    Il n'a besoin ni de mot de passe ni d'une erreur de votre part : il suffit que votre serveur utilise une version de PHP non corrigée.
+    C'est pour cela que de nombreux sites se sont mis en maintenance le temps de se mettre à jour.
+  </p>
+
+  <div class="box warn">
+    <strong>Méfiez-vous des faux outils.</strong> De faux programmes de « test de vulnérabilité » circulent déjà sur GitHub et contiennent du code malveillant.
+    N'exécutez jamais un script que vous ne comprenez pas ou dont vous ne connaissez pas l'origine.
+    <strong>SOS PHP ne vous demandera jamais de télécharger ou d'exécuter un script</strong> : nos guides n'utilisent que des commandes standard, expliquées une par une, et les outils de votre hébergeur.
+  </div>
+
+  <h2>Sources officielles</h2>
+  <ul>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w">Avis de sécurité PHP – CVE-2026-109618 (GitHub)</a></li>
+    <li><a href="https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp">Avis de sécurité PHP – CVE-2026-109619 (GitHub)</a></li>
+    <li><a href="https://www.php.net/downloads.php">Téléchargements PHP (php.net)</a></li>
+    <li><a href="https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching">Alerte CISA du 21 octobre 2026</a></li>
+    <li><a href="https://www.helpnetsecurity.com/2026/10/21/php2shell-php-vulnerabilities-patched-cve-2026-109618-cve-2026-109619/">Help Net Security – résumé technique</a></li>
+  </ul>
+
+  <p class="tuto-note">
+    Dernière mise à jour des informations : 22 octobre 2026. La situation évolue : vérifiez toujours les sources officielles ci-dessus.
+    Ce site est une initiative de prévention indépendante, sans lien avec le projet PHP. Les guides sont fournis sans garantie : faites une sauvegarde avant toute intervention.
+  </p>

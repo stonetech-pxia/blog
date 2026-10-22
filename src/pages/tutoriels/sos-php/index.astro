@@ -1,0 +1,15 @@
+---
+import Tutorial from '../../../layouts/Tutorial.astro';
+import { pages, tutorial } from '../../../tutoriels/sos-php/meta';
+import content from '../../../tutoriels/sos-php/accueil.html?raw';
+---
+
+<Tutorial
+	title="Votre site tourne sous PHP ? Mettez-le à jour maintenant."
+	description={tutorial.description}
+	lead="Une très grande partie des sites web (WordPress, PrestaShop, Joomla, Drupal, Laravel…) fonctionne avec PHP. Les deux failles découvertes permettent à un pirate de prendre le contrôle du serveur à distance, sans mot de passe."
+	tutorial={tutorial}
+	pages={pages}
+>
+	<Fragment set:html={content} />
+</Tutorial>

@@ -1,0 +1,363 @@
+  <div class="box danger">
+    <h3>En bref</h3>
+    <ol>
+      <li>Passez à <strong>8.2.35, 8.3.36, 8.4.27 ou 8.5.12</strong> minimum, ou à un paquet de distribution qui inclut le correctif.</li>
+      <li><strong>Redémarrez tous les workers PHP</strong> (FPM, Apache, LiteSpeed, FrankenPHP, conteneurs).</li>
+      <li><strong>Vérifiez la version servie en HTTP</strong>, pas seulement <code>php -v</code>.</li>
+      <li>Si vous ne pouvez pas mettre à jour tout de suite : appliquez les <a href="#provisoire">mesures provisoires</a> ou mettez le service hors ligne.</li>
+      <li>Une tentative d'exploitation a été observée le 17/10 : faites un <a href="#compromission">contrôle de compromission</a>.</li>
+    </ol>
+  </div>
+
+  <h2>Sommaire</h2>
+  <ul class="toc">
+    <li><a href="#exposition">Suis-je exposé ?</a></li>
+    <li><a href="#diagnostic">Diagnostic en 9 étapes</a></li>
+    <li><a href="#lecture">Lire le résultat</a></li>
+    <li><a href="#pieges">Les pièges</a></li>
+    <li><a href="#debian">Debian / Ubuntu</a></li>
+    <li><a href="#rhel">RHEL / Alma / Rocky</a></li>
+    <li><a href="#alpine">Alpine</a></li>
+    <li><a href="#docker">Docker</a></li>
+    <li><a href="#panneaux">cPanel, Plesk, DirectAdmin</a></li>
+    <li><a href="#windows">Windows / IIS</a></li>
+    <li><a href="#ancien">PHP ≤ 8.1</a></li>
+    <li><a href="#provisoire">Mesures provisoires</a></li>
+    <li><a href="#verification">Vérification</a></li>
+    <li><a href="#compromission">Contrôle de compromission</a></li>
+  </ul>
+
+  <h2 id="exposition">Suis-je exposé ?</h2>
+  <p>Toute installation PHP qui <strong>sert des requêtes web</strong> est concernée. Selon les avis officiels :</p>
+  <div class="table-scroll">
+    <table>
+      <tr><th>SAPI</th><th>Statut d'après les avis PHP</th></tr>
+      <tr><td>Apache mod_php</td><td><strong>RCE validée</strong> en HTTP avec la configuration par défaut. Priorité absolue.</td></tr>
+      <tr><td>PHP-FPM</td><td>RCE validée via le cycle de vie des sessions. Exposition accrue si le frontal transmet <code>PHP_VALUE</code> / <code>PHP_ADMIN_VALUE</code>.</td></tr>
+      <tr><td>FrankenPHP</td><td>Probablement vulnérable d'après l'analyse du code source.</td></tr>
+      <tr><td>LiteSpeed (LSAPI)</td><td>Candidat conditionnel, exploitation non validée publiquement.</td></tr>
+      <tr><td>php-cgi</td><td>Cité comme concerné.</td></tr>
+      <tr><td>Serveurs applicatifs en CLI (Laravel Octane / Swoole / RoadRunner, <code>php -S</code>, <code>artisan serve</code>)</td><td>Ils traitent des requêtes HTTP : par prudence, traitez-les comme exposés.</td></tr>
+      <tr><td>CLI seul (scripts, cron)</td><td>Pas exposé aux requêtes web, mais mettez à jour quand même.</td></tr>
+    </table>
+  </div>
+  <p>
+    Configuration exploitée par la chaîne publique : <code>session.upload_progress.enabled=On</code> (valeur par défaut) et requêtes multipart acceptées.
+    La faille se déclenche <strong>avant l'exécution de votre code</strong> : la qualité de l'application n'y change rien.
+  </p>
+
+  <h2 id="diagnostic">Diagnostic en 9 étapes</h2>
+  <div class="box">
+    <strong>Pas de script à télécharger.</strong> Ce site n'en fournit aucun, et vous ne devriez exécuter aucun « outil de détection » trouvé en ligne.
+    Chaque commande ci-dessous est standard, tient sur une ligne et ne fait que lire. Remplacez <code>8.2</code> par vos versions.
+  </div>
+
+  <h3>1. Quel système ?</h3>
+  <pre><code>cat /etc/os-release</code></pre>
+  <p>Indique quelle section de mise à jour suivre (Debian/Ubuntu, RHEL, Alpine…).</p>
+
+  <h3>2. Quelles installations de PHP existent ?</h3>
+  <pre><code>ls -d /usr/bin/php[0-9]* /usr/sbin/php-fpm* /opt/remi/php* /opt/cpanel/ea-php* /opt/plesk/php/* /opt/alt/php* 2&gt;/dev/null</code></pre>
+  <p>Chaque ligne est une installation à vérifier et à mettre à jour, même si le site ne l'utilise pas.</p>
+
+  <h3>3. Quelle version pour chacune ?</h3>
+  <pre><code>php -v | head -1
+for b in /usr/sbin/php-fpm* /opt/remi/php*/root/usr/sbin/php-fpm /opt/cpanel/ea-php*/root/usr/sbin/php-fpm; do [ -x "$b" ] &amp;&amp; echo "$b : $("$b" -v | head -1)"; done</code></pre>
+  <p>Les binaires FPM sont dans <code>/usr/sbin</code>, absent du PATH d'un utilisateur non-root sur Debian : d'où les chemins complets.
+    <code>php -v</code> n'affiche pas toujours le suffixe de distribution (Debian l'omet, Ubuntu l'affiche) : la version exacte du paquet se lit à l'étape 4.</p>
+
+  <h3>4. D'où viennent les paquets ?</h3>
+  <pre><code>dpkg -l | grep -E '^ii +(php|libapache2-mod-php)'     # Debian / Ubuntu
+rpm -qa | grep -iE '^(php|ea-php|alt-php)'            # RHEL, cPanel, CloudLinux
+apt-cache policy php8.2-common | head -4              # dépôt d'origine (adaptez la version)</code></pre>
+  <p><code>+deb.sury.org</code> = dépôt Sury / ondrej ; <code>~deb12u</code>, <code>ubuntu</code>, <code>.el9</code> = paquets de la distribution, qui peuvent contenir un correctif rétroporté.</p>
+
+  <h3>5. Le correctif est-il dans le paquet ?</h3>
+  <pre><code>zgrep -E 'CVE-2026-10961[89]' /usr/share/doc/php*-common/changelog.Debian.gz           # Debian / Ubuntu / Sury
+rpm -qa '*php*-common' | xargs -r rpm -q --changelog | grep -E 'CVE-2026-10961[89]'     # RHEL / Remi / cPanel</code></pre>
+  <p>Une ligne affichée = correctif présent. Rien affiché : regardez le numéro de version. S'il est égal ou supérieur à la version corrigée, c'est corrigé (certains dépôts ne citent pas les CVE).</p>
+
+  <h3>6. Quel PHP sert vraiment le site ?</h3>
+  <pre><code>ls /etc/apache2/mods-enabled/ 2&gt;/dev/null | grep php                              # mod_php : quelle version (httpd -M sur RHEL)
+grep -RhoE 'proxy:unix:[^|"]+' /etc/apache2/conf-enabled/ /etc/apache2/sites-enabled/ /etc/httpd/conf.d/ 2&gt;/dev/null | sort | uniq -c  # Apache → socket FPM
+sudo nginx -T 2&gt;/dev/null | grep -v '^\s*#' | grep -oE '(server_name|fastcgi_pass)[^;]+'  # nginx : site → socket
+systemctl list-units --type=service --all '*php*fpm*'                               # services FPM</code></pre>
+  <p>Le socket (ex. <code>php8.2-fpm.sock</code>) indique la version utilisée par chaque site. <code>nginx -T</code> ne lit que la configuration active, sans les exemples commentés.
+    Pour confirmer en HTTP, voir <a href="#verification">Vérification</a>.</p>
+
+  <h3>7. La mesure provisoire est-elle active côté FPM ?</h3>
+  <pre><code>/usr/sbin/php-fpm8.2 -i | grep -i 'upload_progress.enabled'      # cPanel : /opt/cpanel/ea-php82/root/usr/sbin/php-fpm -i
+grep -r upload_progress /etc/php/*/fpm/pool.d/ /etc/php-fpm.d/ 2&gt;/dev/null</code></pre>
+  <p>Lit le <code>php.ini</code> de FPM (pas celui du CLI), puis les réglages des pools. Avec mod_php, seule la <a href="#verification">vérification en HTTP</a> fait foi.</p>
+
+  <h3>8. Des processus tournent-ils encore sur l'ancien code ?</h3>
+  <pre><code>sudo grep -l 'php.*(deleted)' /proc/[0-9]*/maps 2&gt;/dev/null | cut -d/ -f3 | xargs -r ps -o pid,cmd -p   # partout
+sudo needrestart -b              # Debian / Ubuntu (absent par défaut sur Debian : sudo apt install needrestart)
+sudo dnf needs-restarting -s     # RHEL et dérivés</code></pre>
+  <p>La première commande liste les processus qui utilisent encore des fichiers PHP remplacés par la mise à jour. Rien affiché = rien à redémarrer.
+    Si <code>php-fpm</code>, <code>apache2</code> ou <code>httpd</code> apparaît : redémarrez-le.</p>
+
+  <h3>9. Et dans les conteneurs ?</h3>
+  <pre><code>for c in $(docker ps --format '{{.Names}}'); do echo "== $c"; docker exec "$c" php -v 2&gt;&amp;1 | grep -m1 '^PHP '; done</code></pre>
+  <p>Un bloc par conteneur ; une version s'affiche s'il contient PHP.</p>
+
+  <h3>Sur plusieurs serveurs</h3>
+  <pre><code>for h in web1 web2 web3; do echo "== $h"; ssh "$h" 'php -v | head -1; ls -d /usr/sbin/php-fpm* 2&gt;/dev/null'; done
+ansible all -m shell -a 'php -v | head -1'</code></pre>
+
+  <h2 id="lecture">Lire le résultat</h2>
+  <p>Appliquez le tableau à <strong>chaque installation</strong> trouvée à l'étape 2 (CLI, FPM, mod_php, conteneurs), et retenez la première ligne qui correspond.</p>
+  <div class="table-scroll">
+    <table>
+      <tr><th>Ce que vous voyez</th><th>Verdict</th><th>Que faire</th></tr>
+      <tr><td>Version (dans <code>dpkg -l</code> / <code>rpm -qa</code>) égale ou supérieure à 8.2.<strong>35</strong>, 8.3.<strong>36</strong>, 8.4.<strong>27</strong> ou 8.5.<strong>12</strong>, avec ou sans suffixe</td><td><strong>Corrigé</strong></td><td>Vérifier que les workers ont redémarré (étape 8).</td></tr>
+      <tr><td>Version inférieure, mais CVE trouvée à l'étape 5</td><td><strong>Corrigé</strong> (rétroporté)</td><td>Redémarrer si besoin.</td></tr>
+      <tr><td>8.2 à 8.5 inférieure, sans CVE à l'étape 5</td><td><strong>Vulnérable</strong></td><td>Mettre à jour (sections ci-dessous).</td></tr>
+      <tr><td>8.1 ou plus ancien, sans CVE, fourni par une distribution encore maintenue (Ubuntu 22.04, RHEL / Alma / Rocky 8 et 9…)</td><td><strong>Vulnérable</strong>, correctif possible</td><td>Mettre à jour les paquets de la distribution, puis refaire l'étape 5.</td></tr>
+      <tr><td>8.1 ou plus ancien, venant de php.net, Sury, d'une compilation ou d'une distribution en fin de vie (Debian 10, Ubuntu 20.04, CentOS 7…)</td><td><strong>Non maintenu</strong></td><td>Correctif source, fournisseur de support étendu, ou migration (<a href="#ancien">voir plus bas</a>).</td></tr>
+      <tr><td>Un processus PHP ou Apache listé à l'étape 8</td><td><strong>Toujours exposé</strong></td><td>Redémarrer le service.</td></tr>
+      <tr><td><code>upload_progress.enabled</code> à <code>On</code> (ou <code>1</code>)</td><td>Pas de mesure provisoire</td><td>Normal une fois corrigé ; sinon, voir <a href="#provisoire">mesures provisoires</a>.</td></tr>
+    </table>
+  </div>
+
+  <h2 id="pieges">Les pièges</h2>
+  <details open>
+    <summary>1. Le correctif rétroporté : un numéro ancien n'est pas forcément vulnérable</summary>
+    <div>
+      <p>Debian, Ubuntu et RHEL appliquent les correctifs sur leur propre version (par ex. <code>8.2.x-1~deb12uN</code>).
+      Comparer le numéro amont ne suffit donc pas : cherchez les CVE dans le changelog du paquet (commandes ci-dessous).
+      Les distributions ont reçu les correctifs avant la publication.</p>
+    </div>
+  </details>
+  <details open>
+    <summary>2. <code>php -v</code> ment souvent</summary>
+    <div>
+      <p>Le binaire CLI peut être à jour pendant que PHP-FPM, mod_php ou une autre version installée (<code>/opt/remi</code>, <code>/opt/cpanel/ea-php*</code>, <code>/opt/plesk/php/*</code>) sert encore le site.
+      Sur un serveur multi-versions, <strong>chaque version installée</strong> doit être mise à jour.</p>
+    </div>
+  </details>
+  <details open>
+    <summary>3. Les anciens workers restent en mémoire</summary>
+    <div>
+      <p>Tant que les processus ne sont pas redémarrés, l'ancien code tourne. Le <code>reload</code> suffit en général pour FPM, mais un <code>restart</code> est plus sûr.
+      Pensez aussi aux conteneurs : un <code>docker pull</code> sans recréer le conteneur ne change rien.</p>
+    </div>
+  </details>
+  <details open>
+    <summary>4. Dépôt Remi</summary>
+    <div>
+      <p>D'après Help Net Security (21/10), <strong>aucune mise à jour n'était disponible sur rpms.remirepo.net</strong> au moment de la publication.
+      Vérifiez l'état du dépôt ; sinon, passez aux paquets de la distribution ou compilez depuis les sources.</p>
+    </div>
+  </details>
+  <details open>
+    <summary>5. Faux PoC</summary>
+    <div>
+      <p>De faux exploits circulent sur GitHub, dont un avec une charge utile encodée en Base64. N'exécutez aucun PoC non vérifié, surtout pas sur la production.</p>
+    </div>
+  </details>
+
+  <h2 id="debian">Debian / Ubuntu (paquets de la distribution ou dépôt Sury / ondrej)</h2>
+  <pre><code># État des lieux
+sudo apt update
+dpkg -l | grep -E '^ii +(php|libapache2-mod-php)'
+apt list --upgradable 2>/dev/null | grep -i php</code></pre>
+  <div class="box warn">
+    <strong>Dépôt ondrej / Sury ajouté sur Ubuntu ou Debian ?</strong> Il propose aussi les versions que la distribution fournit déjà (ex. 8.1 sur Ubuntu 22.04)
+    avec un numéro plus élevé : la mise à jour ci-dessous <strong>remplacerait alors le paquet de la distribution par celui de Sury</strong>.
+    Vérifiez d'abord quel dépôt sera utilisé (ligne <code>Candidate</code>) :
+    <pre><code>apt-cache policy libapache2-mod-php8.1 php8.1-common | grep -E '^\S|Installed|Candidate'</code></pre>
+  </div>
+  <pre><code># 1. Mise à jour de tous les paquets PHP installés (cli, fpm, mod_php, extensions…)
+sudo apt install --only-upgrade $(dpkg -l | awk '/^ii +(php|libapache2-mod-php)/ {print $2}')</code></pre>
+  <pre><code># 2. Le correctif est-il dans les paquets ?
+zgrep -E 'CVE-2026-10961[89]' /usr/share/doc/php*-common/changelog.Debian.gz</code></pre>
+  <pre><code># 3. Redémarrage de toutes les versions de PHP-FPM
+sudo systemctl restart '*php*-fpm.service'</code></pre>
+  <pre><code># 4. Seulement si mod_php (étape 6 du diagnostic)
+sudo systemctl restart apache2</code></pre>
+  <p>Puis l'<a href="#diagnostic">étape 8</a> du diagnostic pour vérifier qu'aucun processus ne tourne sur l'ancien code.</p>
+  <ul>
+    <li><strong>Dépôt Sury / ondrej :</strong> le changelog cite en général les CVE ; à défaut, le numéro de version doit être <strong>au moins égal</strong> à la version corrigée de la branche.</li>
+    <li><strong>PHP 8.1 sur Ubuntu 22.04 (ou toute branche fournie par la distribution) :</strong> la règle « 8.1 = migrer » ne s'applique pas tout de suite, car la distribution
+      maintient sa propre version. Consultez son avis de sécurité (USN pour Ubuntu, DSA/DLA pour Debian) et vérifiez le changelog.</li>
+  </ul>
+
+  <h2 id="rhel">RHEL / AlmaLinux / Rocky / Fedora</h2>
+  <pre><code>rpm -qa | grep -i php
+sudo dnf upgrade --refresh 'php*'
+
+# Le correctif est-il dans les paquets ?
+rpm -qa '*php*-common' | xargs -r rpm -q --changelog | grep -E 'CVE-2026-10961[89]'
+
+sudo systemctl restart php-fpm
+sudo systemctl restart httpd   # si mod_php
+
+# Reste-t-il des processus sur l'ancien code ?
+sudo dnf needs-restarting -s</code></pre>
+  <p>Paquets Remi (<code>php82-php-*</code>, <code>/opt/remi/...</code>) : voir le <a href="#pieges">piège n°4</a>.</p>
+
+  <h2 id="alpine">Alpine</h2>
+  <p><strong>Images Docker officielles <code>php:*-alpine</code> :</strong> cette section ne s'applique pas. PHP y est compilé dans <code>/usr/local</code>,
+    <code>apk upgrade</code> ne le met pas à jour : voir la section <a href="#docker">Docker</a>. Ce qui suit concerne les paquets <code>php83</code>, <code>php84</code>… d'Alpine.</p>
+  <pre><code>apk info | grep -E '^php'
+apk update && apk upgrade
+php -v   # puis redémarrer le service php-fpm (rc-service php-fpm83 restart, par ex.)</code></pre>
+
+  <h2 id="docker">Docker (image officielle <code>php</code>)</h2>
+  <pre><code># 1. Fixez un tag au moins égal à la version corrigée (exemple)
+#    FROM php:8.3.36-fpm   (vérifiez sur Docker Hub que le tag est publié)
+
+# 2. AVANT de recréer : gardez une trace des fichiers modifiés dans les conteneurs
+#    (le contrôle de compromission en aura besoin, la recréation les efface)
+for c in $(docker compose ps -q); do echo "== $c"; docker diff "$c"; done &gt; docker-diff-avant-maj.txt</code></pre>
+  <pre><code># 3. Récupérez les images et reconstruisez, puis recréez seulement le service PHP
+#    (remplacez app par le nom de votre service PHP dans compose.yaml)
+docker compose pull --ignore-buildable
+docker compose build --pull --no-cache app
+docker compose up -d --force-recreate app
+
+# 4. Vérifiez DANS le conteneur
+docker compose exec app php -v
+docker compose exec app php-fpm -i | grep upload_progress.enabled</code></pre>
+  <ul>
+    <li><strong>Images dérivées</strong> (WordPress, Drupal…) : vérifiez qu'une nouvelle version de l'image est publiée, puis recréez les conteneurs.
+      Les images gratuites Bitnami ne sont plus mises à jour depuis 2025 : vérifiez d'où viennent les vôtres.</li>
+    <li><strong>CI :</strong> reconstruisez avec <code>--pull</code> et sans cache, sinon l'ancienne couche PHP est réutilisée. Faites le tour des registres internes.</li>
+  </ul>
+  <h3>Kubernetes</h3>
+  <pre><code># Quelles images tournent ?
+kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | sort -u | grep -i php
+
+# Après avoir publié l'image corrigée (idéalement référencée par digest) :
+kubectl rollout restart deployment/&lt;nom&gt; -n &lt;namespace&gt;</code></pre>
+
+  <h2 id="panneaux">cPanel / WHM, Plesk, DirectAdmin</h2>
+  <h3>cPanel / WHM (EasyApache 4)</h3>
+  <pre><code>rpm -qa | grep -E '^ea-php'            # (Ubuntu : dpkg -l | grep ea-php)
+sudo dnf upgrade 'ea-php*'              # ou yum / apt selon l'OS
+for b in /opt/cpanel/ea-php*/root/usr/bin/php; do echo "$b"; "$b" -v | head -1; done
+sudo /scripts/restartsrv_apache_php_fpm
+sudo /scripts/restartsrv_httpd</code></pre>
+  <p><strong>CloudLinux (PHP Selector / alt-php) :</strong> mettez aussi à jour <code>sudo yum update 'alt-php*'</code>, car chaque compte peut utiliser sa propre version.</p>
+  <h3>Plesk</h3>
+  <p>Outils et paramètres → Mises à jour, ou en ligne de commande :</p>
+  <pre><code>sudo plesk installer --select-release-current --upgrade-installed-components
+for b in /opt/plesk/php/*/bin/php; do echo "$b"; "$b" -v | head -1; done</code></pre>
+  <h3>DirectAdmin (CustomBuild)</h3>
+  <pre><code>cd /usr/local/directadmin/custombuild
+./build update
+./build versions   # la version corrigée est-elle proposée ?
+./build php
+./build versions   # contrôle après compilation</code></pre>
+
+  <h2 id="windows">Windows / IIS</h2>
+  <ol>
+    <li>Téléchargez la version corrigée sur <a href="https://windows.php.net/download/">windows.php.net</a> (même variante NTS/TS et même architecture).</li>
+    <li>Arrêtez le serveur web <strong>avant</strong> de remplacer les fichiers (sinon <code>php-cgi.exe</code> garde les DLL verrouillées et vous obtenez un mélange d'ancienne et de nouvelle version) :
+      <code>iisreset /stop</code> (ou arrêt du service Apache).</li>
+    <li>Sauvegardez le dossier PHP actuel et votre <code>php.ini</code>, remplacez les fichiers, gardez votre <code>php.ini</code>.</li>
+    <li>Vérifiez que le Visual C++ Redistributable requis par la nouvelle version est installé, et que les mappages de gestionnaires IIS pointent vers le bon dossier.</li>
+    <li>Redémarrez : <code>iisreset /start</code>.</li>
+  </ol>
+
+  <h2 id="ancien">PHP 8.1, 8.0, 7.4 et plus ancien</h2>
+  <ul>
+    <li>Ces branches ne sont plus maintenues par PHP. L'équipe de sécurité a publié des <strong>correctifs minimaux sous forme de code source</strong> pour 7.4, 8.0 et 8.1, à compiler vous-même.</li>
+    <li>Votre distribution ou un fournisseur de support étendu (Debian ELTS, TuxCare, Zend…) peut proposer un paquet corrigé : renseignez-vous auprès de lui.</li>
+    <li>À moyen terme : migrez vers 8.2 au minimum. Vérifiez d'abord la compatibilité (<a href="https://github.com/PHPCompatibility/PHPCompatibility">PHPCompatibility</a>, Rector, journal des erreurs en préproduction).</li>
+    <li>Avant 7.4 : aucun correctif. Le centre de cybersécurité britannique (NCSC) recommande de <strong>mettre hors ligne</strong> tout système qu'on ne peut pas corriger rapidement.</li>
+  </ul>
+
+  <h2 id="provisoire">Mesures provisoires (si vous ne pouvez pas mettre à jour tout de suite)</h2>
+  <div class="box warn">
+    Aucune n'est complète. Elles réduisent l'exposition le temps de mettre à jour. Appliquez-les <strong>au niveau administrateur</strong>,
+    puis <strong>redémarrez tous les workers</strong>. Un simple réglage dans <code>php.ini</code> ne suffit pas : <code>ini_set()</code> peut remettre
+    une limite mémoire, et un <code>.user.ini</code> ou un <code>.htaccess</code> peut réactiver <code>session.upload_progress</code>.
+    Utilisez <code>php_admin_value</code> / <code>php_admin_flag</code>, qui ne peuvent pas être modifiés par l'application.
+  </div>
+  <pre><code>; Pool PHP-FPM, par ex. /etc/php/8.2/fpm/pool.d/www.conf (à répéter pour chaque pool)
+
+; CVE-2026-109619 : chemin des sessions
+php_admin_flag[session.upload_progress.enabled] = off
+
+; CVE-2026-109619 : PHP 8.5 uniquement
+php_admin_flag[fatal_error_backtraces] = off
+
+; CVE-2026-109618 : mitigation principale (retire la protection contre l'épuisement mémoire)
+php_admin_value[memory_limit] = -1
+
+; Casse la condition « même worker » (coûteux en performances)
+pm.max_requests = 1</code></pre>
+  <p>Avec mod_php : mêmes directives sous la forme <code>php_admin_flag session.upload_progress.enabled off</code> dans la configuration Apache (pas dans <code>.htaccess</code>).</p>
+  <p><strong>Compensez <code>memory_limit = -1</code></strong> par une limite au niveau du système, sinon une seule requête peut épuiser la mémoire
+    et faire tuer d'autres services (base de données comprise). N'utilisez <strong>pas</strong> <code>RLIMIT_AS</code> / <code>RLIMIT_DATA</code> :</p>
+  <pre><code>sudo systemctl set-property php8.2-fpm.service MemoryMax=2G   # adaptez la valeur et le nom du service</code></pre>
+  <p>Autres mesures citées par les avis :</p>
+  <ul>
+    <li>Garder <code>post_max_size</code> bas et limiter la taille des requêtes au niveau du frontal (nginx, proxy, WAF).</li>
+    <li>Réduire <code>max_input_nesting_level</code> et le nombre de variables et de parties multipart.</li>
+    <li>Si l'application n'utilise pas de formulaires multipart (envoi de fichiers), <strong>bloquer ces requêtes</strong> avant PHP. Exemple nginx, dans le bloc <code>location ~ \.php$</code> :
+      <pre><code>client_max_body_size 1m;
+if ($http_content_type ~* "multipart/form-data") { return 403; }</code></pre></li>
+    <li>Ne pas laisser le frontal transmettre <code>PHP_VALUE</code> / <code>PHP_ADMIN_VALUE</code> à FPM.</li>
+    <li>Cloudflare a déployé des règles WAF pour les vecteurs connus : utile, mais ce n'est qu'un pansement.</li>
+  </ul>
+
+  <h2 id="verification">Vérification</h2>
+  <p>Contrôlez la version <strong>réellement servie</strong>. Créez un fichier temporaire au nom imprévisible dans la racine web du site.
+    D'abord, indiquez cette racine (<strong>modifiez le chemin avant de copier</strong>) :</p>
+  <pre><code>DOCROOT=/var/www/monsite/public   # racine web du site (dossier public/ pour Laravel / Symfony)</code></pre>
+  <pre><code>f="v-$(cat /proc/sys/kernel/random/uuid).php"
+echo '&lt;?php header("Content-Type: text/plain"); echo PHP_VERSION, " ", PHP_SAPI, " upload_progress=", ini_get("session.upload_progress.enabled") ? "On" : "Off";' \
+  | sudo tee "$DOCROOT/$f" &gt;/dev/null
+echo "Ouvrez : https://votre-site/$f"</code></pre>
+  <p>Notez le résultat, <strong>puis seulement</strong> supprimez le fichier (dans le même terminal) :</p>
+  <pre><code>sudo rm -- "$DOCROOT/$f"</code></pre>
+  <p><strong>Laravel / Symfony avec nginx</strong> (seul <code>index.php</code> est servi) ou plusieurs pools FPM : interrogez chaque socket directement, sans rien déposer dans le site.
+    Le fichier de test est placé dans <code>/dev/shm</code>, visible par FPM même avec <code>PrivateTmp</code> (RHEL). Un <code>open_basedir</code> peut toutefois le bloquer.</p>
+  <pre><code>sudo apt install libfcgi-bin   # fournit cgi-fcgi (RHEL : dnf install fcgi, dépôt EPEL)
+echo '&lt;?php echo PHP_VERSION, " upload_progress=", ini_get("session.upload_progress.enabled") ? "On" : "Off", "\n";' | sudo tee /dev/shm/v.php &gt;/dev/null
+for s in /run/php/*.sock /run/php-fpm/*.sock /opt/cpanel/ea-php*/root/usr/var/run/php-fpm/*.sock; do [ -S "$s" ] &amp;&amp; [ ! -L "$s" ] &amp;&amp; echo "$s : $(sudo SCRIPT_FILENAME=/dev/shm/v.php REQUEST_METHOD=GET cgi-fcgi -bind -connect "$s" | tail -1)"; done
+sudo rm /dev/shm/v.php</code></pre>
+  <p>Enfin, l'<a href="#diagnostic">étape 8</a> du diagnostic confirme qu'aucun processus ne tourne encore sur l'ancien code.</p>
+
+  <h2 id="compromission">Contrôle de compromission</h2>
+  <p>Aucun indicateur de compromission officiel n'a été publié à ce jour. Ce sont des vérifications d'hygiène générale, à faire depuis le <strong>15 octobre</strong> par prudence :</p>
+  <pre><code># Fichiers PHP créés ou modifiés depuis le 15/10 (ctime : ne peut pas être falsifié avec touch)
+# Les caches de templates (ex. storage/framework/views) sont exclus : ils changent en permanence
+sudo find /var/www /home /srv -type f -name '*.php' -newerct '2026-10-15' \
+  -not -path '*/storage/framework/*' -not -path '*/var/cache/*' 2&gt;/dev/null &gt; ~/php-modifies.txt
+wc -l ~/php-modifies.txt
+
+# Fichiers PHP dans les dossiers d'upload, et fichiers suspects dans /tmp et /dev/shm
+sudo find /var/www /home /srv -type f -name '*.php*' -path '*upload*' 2&gt;/dev/null
+sudo find /tmp /var/tmp /dev/shm -type f -newerct '2026-10-15' 2&gt;/dev/null
+
+# Rafales d'erreurs fatales mémoire (la faille repose sur des erreurs fatales / OOM), journaux archivés compris
+# (sudo sh -c : les jokers doivent être développés par root, /var/log/httpd n'est pas lisible sinon)
+sudo sh -c "zgrep -h 'Allowed memory size' /var/log/php*-fpm.log* /var/log/php-fpm/* /var/log/apache2/error.log* \
+  /var/log/httpd/error_log* /var/log/nginx/error.log* /etc/apache2/logs/error_log* \
+  /opt/cpanel/ea-php*/root/usr/var/log/php-fpm/* 2&gt;/dev/null" | tail -50
+# (avec nginx + FPM, ces erreurs apparaissent aussi sous la forme « FastCGI sent in stderr » ;
+#  sur cPanel, chaque site peut aussi avoir son propre fichier error_log)
+
+# Tâches planifiées, comptes, clés SSH
+sudo ls -la /etc/cron.* /var/spool/cron/crontabs /var/spool/cron 2&gt;/dev/null
+sudo crontab -l -u www-data 2&gt;/dev/null   # (apache ou nginx selon la distribution)
+awk -F: '$3 == 0 {print "uid 0 :", $1}' /etc/passwd
+awk -F: '$3 &gt;= 1000 {print $1, $6, $7}' /etc/passwd
+sudo find / -name authorized_keys -newerct '2026-10-15' 2&gt;/dev/null
+
+# Connexions établies hors ports de service locaux (le port 443 distant n'est PAS exclu : les C2 l'utilisent)
+sudo ss -tnp state established '( sport != :22 and sport != :80 and sport != :443 )'</code></pre>
+  <p>Au moindre doute : isolez le serveur, conservez les journaux, changez les secrets (base de données, clés d'API, mots de passe administrateur) <strong>après</strong> avoir corrigé PHP, et faites appel à un spécialiste.</p>
+
+  <p class="tuto-note">
+    Dernière mise à jour des informations : 22 octobre 2026. Sources : avis
+    <a href="https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w">GHSA-w8hw-w9fx-j79w</a>,
+    <a href="https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp">GHSA-6wmf-4rv5-p3rp</a>,
+    <a href="https://www.helpnetsecurity.com/2026/10/21/php2shell-php-vulnerabilities-patched-cve-2026-109618-cve-2026-109619/">Help Net Security</a>,
+    <a href="https://research.jfrog.com/post/php2shell-all-you-need-to-know-about-cve-2026-109618-and-cve-2026-109619/">JFrog</a>.
+    Commandes fournies sans garantie : testez et sauvegardez avant d'agir.
+  </p>

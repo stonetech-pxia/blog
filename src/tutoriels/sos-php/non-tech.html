@@ -1,0 +1,294 @@
+  <div class="box warn">
+    <strong>Trois règles d'or avant de commencer</strong>
+    <ol>
+      <li><strong>Faites une sauvegarde</strong> de votre site avant de toucher à quoi que ce soit.</li>
+      <li><strong>Ne donnez jamais vos mots de passe</strong> à ChatGPT ou à une autre IA, ni à quelqu'un qui vous contacte « pour vous aider ».</li>
+      <li><strong>N'exécutez rien que vous ne comprenez pas.</strong> Nous ne vous demanderons jamais de télécharger un fichier ou un script. Si une étape vous semble risquée, arrêtez-vous et demandez à un professionnel.</li>
+    </ol>
+  </div>
+
+  <h2><span class="step-num">1</span>Qui s'occupe de votre site ?</h2>
+  <div class="choices" id="branch-choices">
+    <button type="button" class="choice" data-branch="agence" aria-pressed="false">
+      Une agence, un freelance ou un prestataire qui répond encore
+      <small>Quelqu'un s'occupe de votre site aujourd'hui et vous pouvez le joindre.</small>
+    </button>
+    <button type="button" class="choice" data-branch="mutualise" aria-pressed="false">
+      Je paie un hébergeur, et personne d'autre ne s'en occupe
+      <small>Vous recevez une facture OVHcloud, o2switch, Hostinger, IONOS, LWS, PlanetHoster, Infomaniak… pour un « hébergement web ».
+        <strong>Même si quelqu'un d'autre a créé le site</strong> et ne répond plus.</small>
+    </button>
+    <button type="button" class="choice" data-branch="plateforme" aria-pressed="false">
+      J'utilise une plateforme tout-en-un
+      <small>Wix, Shopify, Squarespace, Webflow, WordPress.com…</small>
+    </button>
+    <button type="button" class="choice" data-branch="serveur" aria-pressed="false">
+      J'ai mon propre serveur
+      <small>Votre facture mentionne « VPS », « Serveur dédié » ou « Instance cloud » (OVHcloud, Scaleway, Hetzner, AWS…).</small>
+    </button>
+    <button type="button" class="choice" data-branch="inconnu" aria-pressed="false">
+      Je ne sais pas
+    </button>
+  </div>
+  <p class="hint">Facture OVHcloud ? « Hébergement Web », « Perso », « Pro » ou « Performance » → choisissez « Je paie un hébergeur ».
+    « VPS » ou « Serveur dédié » → « J'ai mon propre serveur ».</p>
+
+  <!-- Agence -->
+  <section class="branch" data-for="agence" hidden>
+    <h2><span class="step-num">2</span>Envoyez ce message à votre prestataire</h2>
+    <p>C'est à lui d'intervenir. Copiez ce message, complétez les crochets et envoyez-le par e-mail. Demandez une <strong>réponse écrite</strong>.</p>
+    <div class="code-block"><pre id="mail-agence">Bonjour,
+
+Deux failles de sécurité critiques ont été corrigées dans PHP le 21 octobre 2026 (« PHP2Shell », CVE-2026-109618 et CVE-2026-109619, gravité 9,2/10). Elles permettent de prendre le contrôle d'un serveur à distance.
+
+Pouvez-vous me confirmer par écrit, pour mon site [adresse du site] :
+1. la version de PHP utilisée actuellement ;
+2. qu'elle a été mise à jour vers une version corrigée (8.2.35, 8.3.36, 8.4.27, 8.5.12 ou plus récente, ou un paquet de distribution incluant le correctif) ;
+3. si ce n'est pas encore fait, à quelle date l'intervention est prévue ;
+4. qu'une sauvegarde complète a été faite avant l'intervention.
+
+Merci d'avance,
+[Votre nom]</pre></div>
+    <p>Pas de réponse sous 48 h, même après une relance par téléphone ? Ne restez pas bloqué : choisissez « Je paie un hébergeur » ci-dessus (ou « J'ai mon propre serveur » si votre facture mentionne un VPS) et agissez directement.</p>
+  </section>
+
+  <!-- Mutualisé -->
+  <section class="branch" data-for="mutualise" hidden>
+    <h2><span class="step-num">2</span>Faites une sauvegarde</h2>
+    <p>Bonne nouvelle : la plupart des hébergeurs font déjà une sauvegarde automatique chaque jour. Pour en faire une vous-même, juste avant d'agir :</p>
+    <ul>
+      <li><strong>Avec WordPress :</strong> dans le tableau de bord, <em>Extensions → Ajouter une extension</em>, cherchez « UpdraftPlus », cliquez sur <em>Installer</em> puis <em>Activer</em>.
+        Allez ensuite dans <em>Réglages → UpdraftPlus Backups</em> et cliquez sur <em>Sauvegarder maintenant</em>.</li>
+      <li><strong>Sinon :</strong> dans votre espace client, cherchez « Sauvegarde » ou « Backup ».</li>
+      <li><strong>Vous n'y arrivez pas ?</strong> Ce n'est pas grave : demandez-le à votre hébergeur avec le message plus bas, il le fera pour vous.</li>
+    </ul>
+
+    <h2><span class="step-num">3</span>Trouvez votre version de PHP</h2>
+    <p>PHP est le « moteur » qui fait fonctionner votre site. Il faut connaître son numéro <strong>complet</strong>, avec trois nombres (ex. 8.3.36).</p>
+    <p><strong>Option A, si votre site est fait avec WordPress (le plus simple) :</strong> dans le tableau de bord, allez dans
+      <em>Outils → Santé du site</em>, onglet <em>Informations</em>, puis ouvrez la rubrique <em>Serveur</em>.
+      La ligne « Version de PHP » indique le numéro complet. Pas de menu <em>Outils</em> ? Votre compte n'est pas administrateur : passez à l'option B.</p>
+    <p><strong>Option B :</strong> dans votre espace client, cherchez « Version PHP », « Sélecteur PHP » ou « Configuration PHP ».
+      S'il n'affiche que deux nombres (ex. « 8.3 »), ce n'est pas suffisant : passez à l'option C.</p>
+    <p><strong>Option C :</strong> demandez-la à votre hébergeur avec le message plus bas. Il vous répondra avec le numéro exact.</p>
+    <p class="hint">Vous n'avez rien à télécharger ni à installer sur votre site pour cela. Si quelqu'un vous propose un « fichier de test » ou un « outil de détection », refusez.</p>
+
+    <h2><span class="step-num">4</span>Lisez le résultat</h2>
+    <p>Regardez les <strong>deux premiers nombres</strong> (la « série », ex. 8.3), puis le troisième :</p>
+    <div class="box ok"><strong>Vous êtes protégé si vous avez au moins :</strong> 8.2.<strong>35</strong> · 8.3.<strong>36</strong> · 8.4.<strong>27</strong> · 8.5.<strong>12</strong>.
+      Exemple : 8.3.36 ou 8.3.40 = protégé. Rien d'autre à faire.</div>
+    <div class="box warn"><strong>Même série, troisième nombre plus petit</strong> (ex. 8.3.20) : votre hébergeur doit installer le correctif. La plupart le font d'eux-mêmes en quelques jours.
+      Envoyez-lui le message ci-dessous pour en avoir le cœur net. Le numéro contient des lettres en plus (ex. « 8.3.6-0ubuntu ») ? Le correctif est peut-être déjà là : l'hébergeur vous le confirmera.</div>
+    <div class="box danger"><strong>Série 8.1, 8.0, 7.x ou plus ancienne :</strong> votre site utilise une version abandonnée. Il faut passer à une version récente (8.3 ou 8.4),
+      mais <strong>changer de version peut casser le site</strong> si ses extensions sont trop anciennes. Ne le faites qu'après la sauvegarde, en vous faisant guider pas à pas
+      (prompt plus bas) ou en le demandant à votre hébergeur.</div>
+
+    <h3>Message à envoyer à votre hébergeur</h3>
+    <p>Envoyez-le depuis la rubrique « Support », « Assistance » ou « Créer un ticket » de votre espace client.</p>
+    <div class="code-block"><pre id="mail-hebergeur">Bonjour,
+
+Suite aux failles PHP « PHP2Shell » (CVE-2026-109618 et CVE-2026-109619) corrigées le 21 octobre 2026, pouvez-vous me confirmer :
+1. la version exacte de PHP (avec les trois nombres) utilisée par mon site [adresse du site], hébergé sur l'offre [nom de l'offre, visible sur votre facture] ;
+2. qu'elle intègre le correctif, ou sinon à quelle date elle sera mise à jour ;
+3. qu'une sauvegarde récente de mon site existe ;
+4. si une activité suspecte a été détectée sur mon hébergement depuis le 17 octobre.
+
+Merci,
+[Votre nom]</pre></div>
+    <p>Besoin d'être guidé pas à pas ? Passez au <a href="#generateur">générateur de prompt</a>.</p>
+  </section>
+
+  <!-- Plateforme -->
+  <section class="branch" data-for="plateforme" hidden>
+    <div class="box ok">
+      <h3>Bonne nouvelle : vous n'avez rien à faire.</h3>
+      <p>Sur Wix, Shopify, Squarespace, Webflow ou WordPress.com, c'est la plateforme qui gère les serveurs et leurs mises à jour. Vous n'avez pas accès à PHP et n'avez rien à installer.</p>
+    </div>
+    <p>Restez quand même prudent :</p>
+    <ul>
+      <li>Si vous avez <strong>un autre site</strong> (un blog, un ancien site) hébergé ailleurs, refaites ce parcours pour lui.</li>
+      <li>Méfiez-vous des e-mails qui vous demandent de « mettre à jour PHP » en cliquant sur un lien : c'est probablement une arnaque.</li>
+    </ul>
+  </section>
+
+  <!-- Serveur -->
+  <section class="branch" data-for="serveur" hidden>
+    <div class="box warn">
+      Sur votre propre serveur, <strong>personne ne fait les mises à jour à votre place</strong> : OVHcloud et les autres fournisseurs ne mettent pas à jour un VPS pour vous.
+      Si la personne qui l'a installé <strong>répond encore</strong>, envoyez-lui le message de la rubrique « agence » (choisissez-la ci-dessus).
+      Sinon, voici comment faire.
+    </div>
+
+    <h2><span class="step-num">2</span>Regardez d'abord la version de PHP, sans terminal</h2>
+    <p>Si votre site est fait avec WordPress : <em>Outils → Santé du site</em>, onglet <em>Informations</em>, rubrique <em>Serveur</em>, ligne « Version de PHP ».</p>
+    <div class="box danger">
+      <strong>La version commence par 7., 8.0 ou 8.1 ?</strong> Votre serveur est trop ancien pour une simple mise à jour : n'allez pas plus loin seul.
+      Faites la sauvegarde (étape 3), puis envoyez le message ci-dessous à un prestataire.
+    </div>
+    <div class="code-block"><pre id="mail-prestataire-vps">Bonjour,
+
+Je cherche un prestataire pour une intervention urgente sur un serveur VPS [nom du fournisseur, ex. OVHcloud] qui héberge mon site [WordPress / autre] : [adresse du site].
+La personne qui l'a installé n'est plus joignable.
+
+Suite aux failles PHP « PHP2Shell » (CVE-2026-109618 et CVE-2026-109619, 21 octobre 2026), mon site utilise PHP [version lue dans Santé du site], qui ne recevra pas de correctif.
+Une sauvegarde (snapshot) a été faite le [date].
+
+Pouvez-vous me proposer, avec un devis et un délai :
+1. une protection provisoire immédiate ;
+2. la remise à niveau du serveur ou une migration vers un serveur à jour, avec une version de PHP corrigée ;
+3. une vérification que le serveur n'a pas été piraté depuis le 17 octobre.
+
+Je vous transmettrai les accès par téléphone, pas par e-mail.
+
+Merci,
+[Votre nom] – [téléphone]</pre></div>
+    <p>Pour trouver un prestataire : l'annuaire de <a href="https://www.cybermalveillance.gouv.fr/">cybermalveillance.gouv.fr</a>, une agence web locale, ou un indépendant « administrateur Linux / WordPress ».
+      Dans une association ou une entreprise, ce choix et son coût doivent souvent être validés (bureau, gérance).</p>
+
+    <h2><span class="step-num">3</span>Faites une sauvegarde</h2>
+    <p>Dans l'espace client de votre fournisseur, ouvrez votre VPS et cherchez « Snapshot » (une « photo » complète du serveur), « Instantané » ou « Backup ».</p>
+    <ul>
+      <li>L'option est parfois <strong>payante</strong> (quelques euros par mois, bouton « Commander ») : c'est une dépense utile, mais elle doit peut-être être validée.</li>
+      <li>Pas de mot de passe pour l'espace client ? Utilisez « Mot de passe oublié » avec l'adresse e-mail qui reçoit les factures.</li>
+      <li>Vérifiez que le snapshot affiche la <strong>date et l'heure d'aujourd'hui</strong>. En cas de problème, le bouton « Restaurer » remet le serveur dans cet état
+        (les commandes ou réservations reçues entre-temps seraient perdues).</li>
+    </ul>
+
+    <h2><span class="step-num">4</span>Faites-vous guider par une IA, commande par commande</h2>
+    <p>Nous ne fournissons <strong>aucun script</strong> : vous ne devriez jamais exécuter sur votre serveur un programme que vous ne comprenez pas, y compris le nôtre.</p>
+    <p>À la place, le <a href="#generateur">générateur de prompt</a> ci-dessous prépare un message qui demande à l'IA de vous faire taper
+      <strong>de courtes commandes standard, une à la fois</strong>, qui ne font que lire des informations (par exemple <code>php -v</code>, qui affiche la version de PHP).
+      Avant chaque commande, l'IA doit vous expliquer ce qu'elle fait. Vous lui collez le résultat, et elle vous dit quoi faire ensuite.</p>
+    <h3>Votre première connexion au serveur (SSH)</h3>
+    <p>L'« accès SSH » est souvent dans un vieil e-mail qui contient une adresse IP (des chiffres comme 51.75.12.34), un nom d'utilisateur (ex. <code>debian</code>) et un mot de passe.</p>
+    <ul>
+      <li>Dans le terminal, vous tapez la <strong>vraie</strong> adresse et le <strong>vrai</strong> mot de passe. C'est seulement dans ce que vous <strong>collez à l'IA</strong> qu'il faut masquer l'adresse (remplacez-la par MON-IP).</li>
+      <li>Une question en anglais apparaît la première fois (<em>Are you sure you want to continue connecting</em>) : tapez <code>yes</code>.</li>
+      <li>Quand vous tapez le mot de passe, <strong>rien ne s'affiche</strong>, pas même des étoiles : c'est normal.</li>
+      <li>Ne tapez le mot de passe que si la ligne <code>password:</code> est affichée. Jamais à un autre moment, et jamais dans le chat de l'IA.</li>
+      <li>Pour quitter le serveur : tapez <code>exit</code>.</li>
+    </ul>
+    <div class="box warn">
+      Si l'IA vous propose une commande longue, qui télécharge quelque chose (<code>curl</code>, <code>wget</code>), qui commence par <code>rm</code>,
+      ou qui contient <code>sources.list</code>, <code>sed -i</code>, <code>full-upgrade</code>, <code>dist-upgrade</code> ou <code>| bash</code>,
+      <strong>ne la tapez pas</strong> et demandez-lui de vous expliquer pourquoi.
+    </div>
+    <p>À l'aise avec un terminal ? La <a href="/tutoriels/sos-php/developpeurs/#diagnostic">page développeurs</a> liste les commandes de diagnostic une par une, avec un tableau pour lire le résultat.</p>
+  </section>
+
+  <!-- Inconnu -->
+  <section class="branch" data-for="inconnu" hidden>
+    <h2><span class="step-num">2</span>Trouvons qui s'occupe de votre site</h2>
+    <ul>
+      <li>Cherchez dans vos <strong>factures</strong> ou relevés bancaires un paiement mensuel ou annuel à OVHcloud, o2switch, Hostinger, IONOS, Wix, Shopify… ou à une agence web.</li>
+      <li>Cherchez dans vos e-mails « hébergement », « nom de domaine » ou « renouvellement ».</li>
+      <li>Demandez à la personne qui a créé le site.</li>
+    </ul>
+    <p>Une fois trouvé, revenez à la question 1. En attendant, le <a href="#generateur">générateur de prompt</a> peut aussi vous aider à chercher.</p>
+  </section>
+
+  <h2 id="generateur">Générateur de prompt pour ChatGPT, Claude, Mistral ou Gemini</h2>
+  <p>
+    Remplissez ce formulaire. Nous créons un message (un « prompt ») qui donne à l'IA <strong>les informations à jour sur les failles</strong>
+    (qu'elle ne connaît pas forcément) et des <strong>règles de sécurité</strong> pour qu'elle vous guide prudemment, en langage simple.
+    Rien n'est envoyé : tout se passe dans votre navigateur.
+  </p>
+
+  <form class="gen box" id="gen-form">
+    <div>
+      <label for="f-gestion">Qui s'occupe de votre site ?</label>
+      <select id="f-gestion">
+        <option value="inconnu">Je ne sais pas</option>
+        <option value="agence">Une agence / un prestataire</option>
+        <option value="mutualise">Je paie un hébergeur, et personne d'autre ne s'en occupe</option>
+        <option value="plateforme">Une plateforme tout-en-un (Wix, Shopify…)</option>
+        <option value="serveur">Mon propre serveur (VPS, dédié, cloud)</option>
+      </select>
+    </div>
+    <div>
+      <label for="f-hebergeur">Nom de l'hébergeur ou du fournisseur <span class="hint">(facultatif)</span></label>
+      <input id="f-hebergeur" type="text" placeholder="ex. : OVHcloud, o2switch, Hostinger…" autocomplete="off">
+    </div>
+    <div>
+      <label for="f-cms">Avec quel outil votre site est-il fait ? <span class="hint">(souvent visible dans l'adresse de connexion, ex. /wp-admin = WordPress)</span></label>
+      <select id="f-cms">
+        <option>Je ne sais pas</option>
+        <option>WordPress</option>
+        <option>WooCommerce (WordPress)</option>
+        <option>PrestaShop</option>
+        <option>Joomla</option>
+        <option>Drupal</option>
+        <option>Laravel ou Symfony (site développé sur mesure)</option>
+        <option>Autre</option>
+      </select>
+    </div>
+    <fieldset style="border:0; padding:0; margin:0;">
+      <label>À quoi avez-vous accès ? <span class="hint">(cochez tout ce qui s'applique)</span></label>
+      <label style="font-weight:400"><input type="checkbox" name="acces" value="l'administration de mon site (ex. tableau de bord WordPress)" style="width:auto"> Le tableau de bord de mon site (ex. WordPress), pour publier du contenu</label>
+      <label style="font-weight:400"><input type="checkbox" name="acces" value="l'espace client de mon hébergeur" style="width:auto"> L'espace client de mon hébergeur (là où je paie ma facture, ex. OVHcloud)</label>
+      <label style="font-weight:400"><input type="checkbox" name="acces" value="un gestionnaire de fichiers ou un accès FTP" style="width:auto"> Un gestionnaire de fichiers ou un accès FTP <span class="hint">(si ces mots ne vous disent rien, ne cochez pas)</span></label>
+      <label style="font-weight:400"><input type="checkbox" name="acces" value="un accès SSH (terminal)" style="width:auto"> Un accès SSH / terminal <span class="hint">(par exemple un vieil e-mail avec une adresse IP, un nom d'utilisateur et un mot de passe du serveur)</span></label>
+    </fieldset>
+    <div>
+      <label for="f-niveau">Votre aisance avec l'informatique</label>
+      <select id="f-niveau">
+        <option value="debutant">Je n'ai jamais utilisé de terminal ni de ligne de commande</option>
+        <option value="intermediaire">J'ai déjà tapé quelques commandes en suivant un tutoriel</option>
+        <option value="avance">Je suis à l'aise, mais je ne suis pas développeur</option>
+      </select>
+    </div>
+    <div>
+      <label for="f-poste">Votre ordinateur</label>
+      <select id="f-poste">
+        <option>Windows</option>
+        <option>Mac</option>
+        <option>Linux</option>
+        <option>Chromebook / tablette</option>
+      </select>
+    </div>
+    <div>
+      <label for="f-version">Votre version de PHP, si vous la connaissez <span class="hint">(facultatif, ex. 8.3.20 : voir l'étape « Trouvez votre version de PHP »)</span></label>
+      <input id="f-version" type="text" placeholder="ex. : 8.3.20" autocomplete="off">
+    </div>
+    <div>
+      <label for="f-precisions">Autres précisions <span class="hint">(facultatif, sans mot de passe : ex. « la personne qui a créé le site ne répond plus », « boutique en ligne avec des données clients »)</span></label>
+      <textarea id="f-precisions" style="min-height:80px; font-family:inherit; font-size:1rem"></textarea>
+      <p class="hint">Par sécurité, nous masquons automatiquement les adresses IP, e-mails et mots de passe éventuels. Relisez quand même avant d'envoyer.</p>
+    </div>
+    <div>
+      <button type="submit" class="btn">Générer mon prompt</button>
+    </div>
+  </form>
+
+  <section id="prompt-section" hidden>
+    <div class="box warn" id="redaction-note" hidden></div>
+    <p><strong>Ce texte s'adresse à l'IA, pas à vous :</strong> il est normal qu'il contienne des termes techniques. Vous n'avez rien à y faire vous-même ni à modifier : copiez-le tel quel.</p>
+    <div class="code-block">
+      <pre id="prompt-out"></pre>
+    </div>
+    <p><strong>Ensuite :</strong> ouvrez l'IA de votre choix, collez le prompt, et suivez ses étapes <strong>une par une</strong>.
+      Collez-lui le résultat de chaque étape avant de passer à la suivante.</p>
+    <p>
+      <a class="btn secondary" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+      <a class="btn secondary" href="https://claude.ai/" target="_blank" rel="noopener">Claude</a>
+      <a class="btn secondary" href="https://chat.mistral.ai/" target="_blank" rel="noopener">Le Chat (Mistral)</a>
+      <a class="btn secondary" href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini</a>
+    </p>
+    <div class="box">
+      Une IA peut se tromper. Si elle vous propose une commande qui supprime quelque chose, change les droits d'accès ou télécharge un programme depuis un site inconnu,
+      <strong>ne l'exécutez pas</strong> et demandez-lui pourquoi. En cas de doute, faites appel à un professionnel.
+    </div>
+  </section>
+
+  <h2 id="apres">Et après ?</h2>
+  <ul>
+    <li><strong>Vérifiez</strong> que la version de PHP est bien corrigée (WordPress : <em>Outils → Santé du site</em>), et que votre site s'affiche normalement, formulaires et boutique compris.</li>
+    <li><strong>Si votre site était vulnérable</strong> après le 17 octobre, demandez à votre hébergeur ou prestataire s'il a détecté une activité suspecte.</li>
+    <li><strong>Signes d'alerte</strong> : pages bizarres ou publicités inconnues, redirection vers un autre site, comptes administrateurs que vous ne connaissez pas, alerte de Google ou de votre hébergeur.
+      Dans ce cas, contactez votre hébergeur et faites appel à un professionnel ; vous pouvez aussi trouver de l'aide sur <a href="https://www.cybermalveillance.gouv.fr/">cybermalveillance.gouv.fr</a>.</li>
+  </ul>
+
+  <p class="tuto-note">
+    Dernière mise à jour des informations : 22 octobre 2026. Ce site est une initiative de prévention indépendante, sans lien avec le projet PHP.
+    Les guides sont fournis sans garantie : faites une sauvegarde avant toute intervention.
+  </p>
